@@ -23,7 +23,7 @@ namespace FastPuri
     public partial class MainWindow : Window
     {
         string Defaultfilepath = null;
-        string[] Filepaths = null;
+        string[] Filepaths = {"Dammy"};
 
         int FileOrder = 0;
         int FileOrderCache = 0;
@@ -59,19 +59,7 @@ namespace FastPuri
 
             if (filedialog.ShowDialog() == true)
             {
-                SelectImage(filedialog.FileName);
-
-                // Save directory path.
-                FileInfo fi = new FileInfo(filedialog.FileName);
-                Defaultfilepath = fi.DirectoryName;
-
-                //Get all files path.Find the index for the opening file.
-                string extension = "*" + System.IO.Path.GetExtension(filedialog.FileName);
-                Filepaths = System.IO.Directory.GetFiles(Defaultfilepath,extension , SearchOption.TopDirectoryOnly) ;
-
-                FileOrder = Array.IndexOf(Filepaths, filedialog.FileName);
-
-                FileOrderCache = FileOrder;
+                Open_Savedialog(filedialog, filedialog.FileName, true,true);
             }
         }
         private void Button_Prev_Click(object sender, RoutedEventArgs e)
@@ -80,13 +68,13 @@ namespace FastPuri
             {
                 FileOrderCache = FileOrder;
                 FileOrder--;
-                SelectImage(Filepaths[FileOrder]);
+                Open_Savedialog(null, Filepaths[FileOrder], false,true);
             }
             else
             {
                 FileOrderCache = FileOrder;
                 FileOrder = Filepaths.Length-1;
-                SelectImage(Filepaths[FileOrder]);
+                Open_Savedialog(null, Filepaths[FileOrder], false, true);
             }
         }
         private void Button_Next_Click(object sender, RoutedEventArgs e)
@@ -95,82 +83,101 @@ namespace FastPuri
             {
                 FileOrderCache = FileOrder;
                 FileOrder++;
-                SelectImage(Filepaths[FileOrder]);
+                Open_Savedialog(null, Filepaths[FileOrder], false, true);
             }
             else
             {
                 FileOrderCache = FileOrder;
                 FileOrder = 0;
-                SelectImage(Filepaths[FileOrder]);
+                Open_Savedialog(null, Filepaths[FileOrder],false, true);
             }
-        }
-        private void SelectImage(string FileName)
-        {
-            //Ask if want save.
-            if (isPainting)
-            {
-                MessageBoxResult result = MessageBox.Show("プリクラを保存しますか？","SaveDialog",MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-
-                if(result == MessageBoxResult.Yes)
-                {
-                    LoadImage(FileName);
-                    //image saveing...under maintenance...
-                }
-                else if(result == MessageBoxResult.No)
-                {
-                    LoadImage(FileName);
-                    MainCanvas.Strokes.Clear();
-                }
-                else if(result == MessageBoxResult.Cancel)
-                {
-                    //do not
-                    FileOrder = FileOrderCache;
-                }
-            }
-            else
-            {
-                LoadImage(FileName);
-            }
-        }
-        private void LoadImage(string FileName)
-        {
-            //Null check.
-            if (System.IO.File.Exists(FileName))
-            {
-                BitmapImage btm = new BitmapImage();
-                LabelInfomation.Content = FileName;
-
-                using (FileStream str = File.OpenRead(FileName))
-                {
-                    btm.BeginInit();
-                    btm.StreamSource = str;
-                    btm.CacheOption = BitmapCacheOption.OnLoad;
-                    btm.CreateOptions = BitmapCreateOptions.None;
-                    btm.EndInit();
-                    btm.Freeze();
-                }
-
-                MainImage.Source = btm;
-
-                MainCanvas.Height = btm.Height;
-                MainCanvas.Width = btm.Width;
-
-                canvas.Height = btm.Height;
-                canvas.Width = btm.Width;
-            }
-            else
-            {
-                MainImage.Source = null;
-            }
-
-            isPainting = false;
-            LabelInfomation.Foreground = Brushes.White;
         }
         private void MainCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
             //Set paintingstatus.
             isPainting = true;
             LabelInfomation.Foreground = Brushes.Yellow;
+        }
+        private void Open_Savedialog(FileDialog filedialog,string filename,bool isloadarray,bool isload)
+        {
+            //Array load cansel.
+            bool load = isload;
+
+            if (isPainting)
+            {
+                MessageBoxResult result = MessageBox.Show("プリクラを保存しますか？", "SaveDialog", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    load = true;
+                    isPainting = false;
+                    LabelInfomation.Foreground = Brushes.White;
+
+                    //image saveing...under maintenance...
+
+                }
+                else if (result == MessageBoxResult.No)
+                {
+                    load = true;
+                    isPainting = false;
+                    LabelInfomation.Foreground = Brushes.White;
+
+                    MainCanvas.Strokes.Clear();
+                }
+                else if (result == MessageBoxResult.Cancel)
+                {
+                    load = false;
+                    FileOrder = FileOrderCache;
+                    //do not
+                }
+            }
+
+            if (isloadarray == true && load == true)
+            {
+                // Save directory path.
+                FileInfo fi = new FileInfo(filedialog.FileName);
+                Defaultfilepath = fi.DirectoryName;
+
+                //Get all files path.Find the index for the opening file.
+                string extension = "*" + System.IO.Path.GetExtension(filedialog.FileName);
+                Filepaths = System.IO.Directory.GetFiles(Defaultfilepath, extension, SearchOption.TopDirectoryOnly);
+
+                FileOrder = Array.IndexOf(Filepaths, filedialog.FileName);
+
+                FileOrderCache = FileOrder;
+            }
+
+            if (load)
+            {
+                //Null check.
+                if (System.IO.File.Exists(filename))
+                {
+                    BitmapImage btm = new BitmapImage();
+                    LabelInfomation.Content = filename;
+
+                    using (FileStream str = File.OpenRead(filename))
+                    {
+                        btm.BeginInit();
+                        btm.StreamSource = str;
+                        btm.CacheOption = BitmapCacheOption.OnLoad;
+                        btm.CreateOptions = BitmapCreateOptions.None;
+                        btm.EndInit();
+                        btm.Freeze();
+                    }
+
+                    MainImage.Source = btm;
+
+                    MainCanvas.Height = btm.Height;
+                    MainCanvas.Width = btm.Width;
+
+                    canvas.Height = btm.Height;
+                    canvas.Width = btm.Width;
+                }
+                else
+                {
+                    //MainImage.Source = null;
+                }
+            }
         }
     }
 }
