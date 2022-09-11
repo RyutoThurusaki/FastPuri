@@ -18,10 +18,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Ink;
+using Microsoft.VisualBasic.FileIO;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 
 namespace FastPuri
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : System.Windows.Window
     {
         string Defaultfilepath = null;
         string[] Filepaths = {"Dammy"};
@@ -31,28 +34,14 @@ namespace FastPuri
 
         bool isPainting = false;
         bool isOutline = false;
+        bool isPointErace = false;
 
-        DispatcherTimer updatetimer = null;
+        BitmapImage MainImageBitmap = new BitmapImage();
         public MainWindow()
         {
             InitializeComponent();
             MainCanvas.ResizeEnabled = false;
-            //AddUpdate();
         }
-        /*
-        public void AddUpdate()
-        {
-            updatetimer = new DispatcherTimer(DispatcherPriority.Background);
-            updatetimer.Interval = new TimeSpan(0,0,0);
-            updatetimer.Tick += (e, s) => { Debug_Update(); };
-
-            updatetimer.Start();
-        }
-
-        public void Debug_Update()
-        {
-
-        }*/
 
         private void ClicktoOpen(object sender, RoutedEventArgs e)
         {
@@ -62,46 +51,11 @@ namespace FastPuri
 
             if (filedialog.ShowDialog() == true)
             {
-                Open_Savedialog(filedialog, filedialog.FileName, true,true);
+                Open_Savedialog(filedialog, 0, 0, true,true);
             }
         }
 
-        private void Button_Prev_Click(object sender, RoutedEventArgs e)
-        {
-            if (FileOrder > 0)
-            {
-                FileOrder--;
-                Open_Savedialog(null, Filepaths[FileOrder], false,true);
-            }
-            else
-            {
-                FileOrder = Filepaths.Length-1;
-                Open_Savedialog(null, Filepaths[FileOrder], false, true);
-            }
-        }
-
-        private void Button_Next_Click(object sender, RoutedEventArgs e)
-        {
-            if (FileOrder < Filepaths.Length-1)
-            {
-                FileOrder++;
-                Open_Savedialog(null, Filepaths[FileOrder], false, true);
-            }
-            else
-            {
-                FileOrder = 0;
-                Open_Savedialog(null, Filepaths[FileOrder],false, true);
-            }
-        }
-
-        private void MainCanvas_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            //Set paintingstatus.
-            isPainting = true;
-            LabelInfomation.Foreground = Brushes.Yellow;
-        }
-
-        private void Open_Savedialog(FileDialog filedialog,string filename,bool isloadarray,bool isload)
+        private async void Open_Savedialog(FileDialog filedialog,int new_fileorder,int old_fileorder,bool isloadarray,bool isload)
         {
             //Array load cancel.
             bool load = isload;
@@ -115,7 +69,7 @@ namespace FastPuri
                 {
                     load = true;
 
-                    Save_Image();
+                    Save_Image(Filepaths[old_fileorder]);
                 }
                 else if (result == MessageBoxResult.No)
                 {
@@ -142,21 +96,27 @@ namespace FastPuri
 
                 //Get all files path.Find the index for the opening file.
                 string extension = "*" + System.IO.Path.GetExtension(filedialog.FileName);
-                Filepaths = System.IO.Directory.GetFiles(Defaultfilepath, extension, SearchOption.TopDirectoryOnly);
+                Filepaths = System.IO.Directory.GetFiles(Defaultfilepath, extension, System.IO.SearchOption.TopDirectoryOnly);
 
                 FileOrder = Array.IndexOf(Filepaths, filedialog.FileName);
+            }else if(isloadarray == false && load == true)
+            {
+                FileOrder = new_fileorder;
             }
 
             //Image opening to canvas.
             if (load)
             {
                 //Null check.
-                if (System.IO.File.Exists(filename))
+                if (System.IO.File.Exists(Filepaths[FileOrder]))
                 {
-                    BitmapImage btm = new BitmapImage();
-                    LabelInfomation.Content = filename;
+                    OutlineCanvas.Strokes.Clear();
+                    MainCanvas.Strokes.Clear();
 
-                    using (FileStream str = File.OpenRead(filename))
+                    BitmapImage btm = new BitmapImage();
+                    LabelInfomation.Content = Filepaths[FileOrder];
+
+                    using (FileStream str = File.OpenRead(Filepaths[FileOrder]))
                     {
                         btm.BeginInit();
                         btm.StreamSource = str;
@@ -167,12 +127,13 @@ namespace FastPuri
                     }
 
                     MainImage.Source = btm;
+                    MainImageBitmap = btm;
 
-                    MainCanvas.Height = btm.Height;
-                    MainCanvas.Width = btm.Width;
+                    MainCanvas.Height = MainImageBitmap.Height;
+                    MainCanvas.Width = MainImageBitmap.Width;
 
-                    canvas.Height = btm.Height;
-                    canvas.Width = btm.Width;
+                    canvas.Height = MainImageBitmap.Height;
+                    canvas.Width = MainImageBitmap.Width;
                 }
                 else
                 {
@@ -181,35 +142,32 @@ namespace FastPuri
             }
         }
 
-        private void Save_Image()
+        private void Save_Image(string Filepath)
         {
+            FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 
-            OutlineCanvas.Strokes.Clear();
-            MainCanvas.Strokes.Clear();
+            var bitcache = MainImageBitmap;
+            //var size = new Size(bitcache.Width, bitcache.Height);
 
+            var renderbmp = new System.Drawing.Bitmap((int)bitcache.Width, (int)bitcache.Height);
+            /*
+            using (var os = new FileStream(Filepath, FileMode.Create))
+            {
+                Mat baseimg = new Mat(Filepath);
+                Mat maincvs = OpenCvSharp.Extensions.BitmapConverter.ToMat(renderbmp);
+
+                var addresult = new Mat();
+
+                Cv2.Add(baseimg, maincvs, addresult);
+                System.Drawing.Bitmap result = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(addresult);
+
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(result));
+                encoder.Save(os);
+            }
+            */
             isPainting = false;
             LabelInfomation.Foreground = Brushes.White;
-        }
-
-        private void OutlineEnable_Click(object sender, RoutedEventArgs e)
-        {
-            isOutline = !isOutline;
-            MainCanvas_PreviewMouseUp(this,null);
-
-            if (!isOutline)
-            {
-                OutlineCanvas.Strokes.Clear();
-            }
-        }
-
-        private void Mode_Eraser_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Mode_Pen_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private async void MainCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -241,8 +199,65 @@ namespace FastPuri
                 }
 
                 int hoge = MainCanvas.Strokes.Count;
-                //MessageBox.Show(hoge.ToString(), "StrokeCounts");
+                MessageBox.Show(hoge.ToString(), "StrokeCounts");
             }
+        }
+
+        private void Button_Prev_Click(object sender, RoutedEventArgs e)
+        {
+            if (FileOrder > 0)
+            {
+                Open_Savedialog(null, FileOrder - 1, FileOrder, false, true);
+            }
+            else
+            {
+                Open_Savedialog(null, Filepaths.Length - 1, FileOrder, false, true);
+            }
+        }
+
+        private void Button_Next_Click(object sender, RoutedEventArgs e)
+        {
+            if (FileOrder < Filepaths.Length - 1)
+            {
+                Open_Savedialog(null, FileOrder + 1, FileOrder, false, true);
+            }
+            else
+            {
+                Open_Savedialog(null, 0, FileOrder, false, true);
+            }
+        }
+
+        private void OutlineEnable_Click(object sender, RoutedEventArgs e)
+        {
+            isOutline = !isOutline;
+            MainCanvas_PreviewMouseUp(this,null);
+
+            if (!isOutline)
+            {
+                OutlineCanvas.Strokes.Clear();
+            }
+        }
+
+        private void Mode_Eraser_Click(object sender, RoutedEventArgs e)
+        {
+            if (isPointErace)
+            {
+                MainCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+            }
+            else
+            {
+                MainCanvas.EditingMode = InkCanvasEditingMode.EraseByStroke;
+            }
+        }
+
+        private void Mode_Pen_Click(object sender, RoutedEventArgs e)
+        {
+            MainCanvas.EditingMode = InkCanvasEditingMode.Ink;
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            Save_Image(Filepaths[FileOrder]);
         }
     }
 }
