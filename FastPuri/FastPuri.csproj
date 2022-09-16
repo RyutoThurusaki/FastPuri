@@ -130,10 +130,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="FastPuri_Eraser.png" />
+    <Resource Include="FastPuri_Outline.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="FastPuri_Pen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="FastPuri_Eraser.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

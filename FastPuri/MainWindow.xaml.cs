@@ -19,8 +19,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Ink;
 using Microsoft.VisualBasic.FileIO;
+using System.Drawing;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
+using Image = System.Windows.Controls.Image;
 
 namespace FastPuri
 {
@@ -35,6 +37,8 @@ namespace FastPuri
         bool isPainting = false;
         bool isOutline = false;
         bool isPointErace = false;
+
+        Stream maincvs_result = null;
 
         BitmapImage MainImageBitmap = new BitmapImage();
         public MainWindow()
@@ -55,7 +59,7 @@ namespace FastPuri
             }
         }
 
-        private async void Open_Savedialog(FileDialog filedialog,int new_fileorder,int old_fileorder,bool isloadarray,bool isload)
+        private void Open_Savedialog(FileDialog filedialog,int new_fileorder,int old_fileorder,bool isloadarray,bool isload)
         {
             //Array load cancel.
             bool load = isload;
@@ -75,7 +79,7 @@ namespace FastPuri
                 {
                     load = true;
                     isPainting = false;
-                    LabelInfomation.Foreground = Brushes.White;
+                    LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
 
                     OutlineCanvas.Strokes.Clear();
                     MainCanvas.Strokes.Clear();
@@ -144,30 +148,78 @@ namespace FastPuri
 
         private void Save_Image(string Filepath)
         {
-            FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+            BitmapImage btm = new BitmapImage();
 
-            var bitcache = MainImageBitmap;
-            //var size = new Size(bitcache.Width, bitcache.Height);
+            using (FileStream str = File.OpenRead(Filepath))
+            {
+                btm.BeginInit();
+                btm.StreamSource = str;
+                btm.CacheOption = BitmapCacheOption.OnLoad;
+                btm.CreateOptions = BitmapCreateOptions.None;
+                btm.EndInit();
+                btm.Freeze();
 
-            var renderbmp = new System.Drawing.Bitmap((int)bitcache.Width, (int)bitcache.Height);
+                Mat image = BitmapConverter.ToMat(new Bitmap(btm.StreamSource));
+
+                System.Drawing.Size printsize = new System.Drawing.Size((int)btm.Width, (int)btm.Height);
+                System.Drawing.Size DPISize = new System.Drawing.Size((int)btm.DpiX, (int)btm.DpiY);
+
+                Mat main = CanvastoMat(MainCanvas, printsize, DPISize);
+                Mat outline = CanvastoMat(OutlineCanvas, printsize, DPISize);
+
+                Mat penresult = new Mat();
+                Mat result = new Mat();
+
+                //Cv2.Add(outline, main, result);
+                result = main + outline;
+                //Cv2.Add(image, penresult, result);
+                Bitmap tobitmap = BitmapConverter.ToBitmap(result, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                //FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+
+                tobitmap.Save(Filepath + ".png");
+            }
+
+
             /*
             using (var os = new FileStream(Filepath, FileMode.Create))
             {
-                Mat baseimg = new Mat(Filepath);
-                Mat maincvs = OpenCvSharp.Extensions.BitmapConverter.ToMat(renderbmp);
+                Mat main = CanvastoMat(MainCanvas, printsize, DPISize);
+                Mat outline = CanvastoMat(OutlineCanvas, printsize, DPISize);
 
-                var addresult = new Mat();
+                OpenCvSharp.
 
-                Cv2.Add(baseimg, maincvs, addresult);
-                System.Drawing.Bitmap result = OpenCvSharp.Extensions.BitmapConverter.ToBitmap(addresult);
+                Mat result = null;
+                Bitmap tobitmap = null;
+                Cv2.Add(main, outline, result);
+                BitmapConverter.ToBitmap(result,tobitmap);
 
                 var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(result));
+                encoder.Frames.Add(BitmapFrame.Create(tobi));
                 encoder.Save(os);
-            }
-            */
+            }*/
+
             isPainting = false;
-            LabelInfomation.Foreground = Brushes.White;
+            LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
+        }
+
+        public Mat CanvastoMat(InkCanvas canvas, System.Drawing.Size imagesize, System.Drawing.Size imageDPIs)
+        {
+            Mat result = new Mat();
+
+            using (var stream = new MemoryStream())
+            {
+                var renderbtm = new RenderTargetBitmap((int)imagesize.Width, (int)imagesize.Height, imageDPIs.Width, imageDPIs.Height, PixelFormats.Pbgra32);
+
+                BitmapEncoder encoder = new BmpBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(renderbtm));
+                encoder.Save(stream);
+
+                var btm = new System.Drawing.Bitmap(stream);
+                result = BitmapConverter.ToMat(btm);
+            }
+
+            return result;
         }
 
         private async void MainCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -176,7 +228,7 @@ namespace FastPuri
             {
                 //This function summon is mouse event other possibility.
                 //if Mouse event only.
-                LabelInfomation.Foreground = Brushes.Yellow;
+                LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255,249, 248, 113));
                 isPainting = true;
             }
 
@@ -197,9 +249,6 @@ namespace FastPuri
                 {
                     this.OutlineCanvas.Strokes[i].DrawingAttributes = inkda;
                 }
-
-                int hoge = MainCanvas.Strokes.Count;
-                MessageBox.Show(hoge.ToString(), "StrokeCounts");
             }
         }
 
@@ -258,6 +307,11 @@ namespace FastPuri
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             Save_Image(Filepaths[FileOrder]);
+        }
+
+        private void ColorSelect_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
