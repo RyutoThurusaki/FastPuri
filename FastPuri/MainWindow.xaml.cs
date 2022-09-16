@@ -311,7 +311,8 @@ namespace FastPuri
 
         private void ColorSelect_Click(object sender, RoutedEventArgs e)
         {
-
+            var picker = new ColorSelect();
+            picker.Show();
         }
     }
 }

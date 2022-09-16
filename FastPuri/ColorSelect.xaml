@@ -4,13 +4,45 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FastPuri"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="ColorSelect" Height="450" Width="300">
+        Title="ColorSelect" Height="450" Width="300"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+
+    <Window.Resources>
+        <sys:Double x:Key="EllipseWidth">20.0</sys:Double>
+        <sys:Boolean x:Key="ButtonEnable">false</sys:Boolean>
+        <SolidColorBrush x:Key="ButtonColor" Color="#8785EF"/>
+        <SolidColorBrush x:Key="TextColor" Color="#FAF7FF"/>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="721*"/>
             <ColumnDefinition Width="79*"/>
         </Grid.ColumnDefinitions>
+
+        <materialDesign:ColorPicker Margin="10,10,10,0" Grid.ColumnSpan="2" Height="255" VerticalAlignment="Top"/>
+        <Label Content="MainColor" HorizontalAlignment="Left" Margin="10,0,0,140" VerticalAlignment="Bottom"/>
+        <Label Content="OutlineColor" HorizontalAlignment="Left" Margin="10,0,0,59" VerticalAlignment="Bottom"/>
+        <Button Content="" Margin="10,0,0,103" BorderBrush="#FF717171" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="194" Background="Black"/>
+        <Button Content="" Margin="10,0,0,22" BorderBrush="#FF717171" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="194" Background="White"/>
+        <Button Content="OK" HorizontalAlignment="Right" Margin="0,0,10,22" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Width="67" BorderBrush="#FF717171"/>
+        <Button Content="" HorizontalAlignment="Right" Margin="0,0,10,68" VerticalAlignment="Bottom" BorderBrush="#FF717171" Grid.ColumnSpan="2" Height="67" Width="67">
+            <Button.Background>
+                <RadialGradientBrush>
+                    <GradientStop Color="Black" Offset="0.697"/>
+                    <GradientStop Color="White" Offset="0.733"/>
+                </RadialGradientBrush>
+            </Button.Background>
+        </Button>
 
     </Grid>
 </Window>
