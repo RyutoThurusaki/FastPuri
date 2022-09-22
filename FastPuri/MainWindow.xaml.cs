@@ -23,6 +23,7 @@ using System.Drawing;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using Image = System.Windows.Controls.Image;
+using Color = System.Windows.Media.Color;
 
 namespace FastPuri
 {
@@ -32,15 +33,17 @@ namespace FastPuri
         string[] Filepaths = {"Dammy"};
 
         int FileOrder = 0;
-        int OutlineSize = 5;
 
         bool isPainting = false;
-        bool isOutline = false;
         bool isPointErace = false;
 
-        Stream maincvs_result = null;
+        public Color color_pen;
+        public Color color_outline;
+        public int pensize;
+        public int outlinesize;
 
         BitmapImage MainImageBitmap = new BitmapImage();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -161,6 +164,7 @@ namespace FastPuri
 
                 Mat image = BitmapConverter.ToMat(new Bitmap(btm.StreamSource));
 
+                //Apply print size setting.
                 System.Drawing.Size printsize = new System.Drawing.Size((int)btm.Width, (int)btm.Height);
                 System.Drawing.Size DPISize = new System.Drawing.Size((int)btm.DpiX, (int)btm.DpiY);
 
@@ -169,15 +173,23 @@ namespace FastPuri
 
                 Mat penresult = new Mat();
                 Mat result = new Mat();
+                Mat allresult = new Mat();
 
-                //Cv2.Add(outline, main, result);
-                result = main + outline;
-                //Cv2.Add(image, penresult, result);
-                Bitmap tobitmap = BitmapConverter.ToBitmap(result, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                Cv2.Add(outline, main, penresult);
+                //Cv2.Add(result, penresult, allresult);
+                Bitmap tobitmap = BitmapConverter.ToBitmap(penresult, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
                 //FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 
-                tobitmap.Save(Filepath + ".png");
+                //test
+                IntPtr hbit = tobitmap.GetHbitmap();
+                MainImage.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hbit, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                //test end
+
+                MainCanvas.Strokes.Clear();
+                OutlineCanvas.Strokes.Clear();
+                
+                tobitmap.Save(Filepath + ".png",System.Drawing.Imaging.ImageFormat.Png);
             }
 
 
@@ -234,21 +246,20 @@ namespace FastPuri
 
             await Task.Delay(1);
 
-            if (isOutline)
+            if (outlinesize != 0)
             {
-                DrawingAttributes inkda = new DrawingAttributes();
-
-                inkda.Width = MainCanvas.DefaultDrawingAttributes.Width + OutlineSize;
-                inkda.Height = MainCanvas.DefaultDrawingAttributes.Height + OutlineSize;
-
-                inkda.Color = Colors.White;
-
                 OutlineCanvas.Strokes = MainCanvas.Strokes.Clone();
 
-                for (int i = 0; i < MainCanvas.Strokes.Count; i++)
+                for (int i = 0; i < OutlineCanvas.Strokes.Count; i++)
                 {
-                    this.OutlineCanvas.Strokes[i].DrawingAttributes = inkda;
+                    OutlineCanvas.Strokes[i].DrawingAttributes.Width = OutlineCanvas.Strokes[i].DrawingAttributes.Width + outlinesize;
+                    OutlineCanvas.Strokes[i].DrawingAttributes.Height = OutlineCanvas.Strokes[i].DrawingAttributes.Height + outlinesize;
+
+                    OutlineCanvas.Strokes[i].DrawingAttributes.Color = color_outline;
                 }
+                //本当は以前の配列と比較して増えた分に対してのみDA.Setしたい
+                //PointEraserで消したとき増えた分の処理がむずい
+                //現状だとifでfalseなやつはそのままの色に成るから太さが変わって見える、意図しない挙動
             }
         }
 
@@ -276,19 +287,10 @@ namespace FastPuri
             }
         }
 
-        private void OutlineEnable_Click(object sender, RoutedEventArgs e)
-        {
-            isOutline = !isOutline;
-            MainCanvas_PreviewMouseUp(this,null);
-
-            if (!isOutline)
-            {
-                OutlineCanvas.Strokes.Clear();
-            }
-        }
-
         private void Mode_Eraser_Click(object sender, RoutedEventArgs e)
         {
+            isPointErace = !isPointErace;
+
             if (isPointErace)
             {
                 MainCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
@@ -311,8 +313,25 @@ namespace FastPuri
 
         private void ColorSelect_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new ColorSelect();
-            picker.Show();
+            var picker = new ColorSelect(this);
+            picker.ShowDialog();
+
+            if ((Boolean)picker.DialogResult)
+            {
+                var DDA = MainCanvas.DefaultDrawingAttributes;
+                DDA.Width = pensize;
+                DDA.Height = pensize;
+                DDA.Color = color_pen;
+
+                Preview_Pen.Fill = new SolidColorBrush(color_pen);
+                Preview_Pen.Stroke = new SolidColorBrush(color_outline);
+
+                MainCanvas_PreviewMouseUp(this, null);
+            }
+            else
+            {
+                //Do not
+            }
         }
     }
 }

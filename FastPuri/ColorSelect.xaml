@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FastPuri"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="ColorSelect" Height="450" Width="300"
+        Title="ColorSelect" Height="450" Width="320"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -29,20 +29,28 @@
             <ColumnDefinition Width="79*"/>
         </Grid.ColumnDefinitions>
 
-        <materialDesign:ColorPicker Margin="10,10,10,0" Grid.ColumnSpan="2" Height="255" VerticalAlignment="Top"/>
-        <Label Content="MainColor" HorizontalAlignment="Left" Margin="10,0,0,140" VerticalAlignment="Bottom"/>
-        <Label Content="OutlineColor" HorizontalAlignment="Left" Margin="10,0,0,59" VerticalAlignment="Bottom"/>
-        <Button Content="" Margin="10,0,0,103" BorderBrush="#FF717171" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="194" Background="Black"/>
-        <Button Content="" Margin="10,0,0,22" BorderBrush="#FF717171" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="194" Background="White"/>
-        <Button Content="OK" HorizontalAlignment="Right" Margin="0,0,10,22" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Width="67" BorderBrush="#FF717171"/>
-        <Button Content="" HorizontalAlignment="Right" Margin="0,0,10,68" VerticalAlignment="Bottom" BorderBrush="#FF717171" Grid.ColumnSpan="2" Height="67" Width="67">
+        <materialDesign:ColorPicker x:Name="ColorPicker"  Margin="10,10,10,0" Grid.ColumnSpan="2" Height="255" VerticalAlignment="Top"/>
+        <Label Content="PenColor" HorizontalAlignment="Left" Margin="6,272,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
+        <Label Content="OutlineColor" HorizontalAlignment="Left" Margin="110,272,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
+        <Button x:Name="Button_PenColor" Click="Button_PenColor_Click" Content="" Margin="10,299,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="93" Background="Black"/>
+        <Button x:Name="Button_OutlineColor" Click="Button_OutlineColor_Click" Content="" Margin="114,299,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="93" Background="White"/>
+        <Button x:Name="Button_Apply" Click="Button_Apply_Click" Content="OK" HorizontalAlignment="Right" Margin="0,380,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="67" Foreground="White"/>
+        <Button x:Name="Button_PenPreview" HorizontalAlignment="Right" Margin="0,299,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="67" Width="67">
             <Button.Background>
-                <RadialGradientBrush>
-                    <GradientStop Color="Black" Offset="0.697"/>
-                    <GradientStop Color="White" Offset="0.733"/>
+                <RadialGradientBrush SpreadMethod="Pad" MappingMode="RelativeToBoundingBox">
+                    <GradientStop Color="Black" Offset="0.403"/>
+                    <GradientStop Color="White" Offset="0.423"/>
+                    <GradientStop Color="Transparent" Offset="0.607"/>
+                    <GradientStop Color="White" Offset="0.58"/>
                 </RadialGradientBrush>
             </Button.Background>
         </Button>
+        <Image Source="/Ichimatu.png" Margin="0,299,10,0" Grid.ColumnSpan="2" IsHitTestVisible="False" HorizontalAlignment="Right" VerticalAlignment="Top" Panel.ZIndex="-1" Width="67" Height="67"/>
+        <Label Content="PenSize" HorizontalAlignment="Left" Margin="6,358,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
+        <Label Content="OutlineSize" HorizontalAlignment="Left" Margin="109,358,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
+        <Slider x:Name="Slider_Pen" HorizontalAlignment="Left" Margin="10,386,0,0" VerticalAlignment="Top" Width="93" Maximum="40" Minimum="2"/>
+        <Slider x:Name="Slider_Outline" HorizontalAlignment="Left" Margin="114,386,0,0" VerticalAlignment="Top" Width="92" Maximum="27"/>
+        <Label Content="Preview" HorizontalAlignment="Right" Margin="0,272,31,0" VerticalAlignment="Top" HorizontalContentAlignment="Left" Grid.ColumnSpan="2"/>
 
     </Grid>
 </Window>
