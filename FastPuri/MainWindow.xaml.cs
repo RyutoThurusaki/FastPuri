@@ -20,17 +20,21 @@ using System.Windows.Shapes;
 using System.Windows.Ink;
 using Microsoft.VisualBasic.FileIO;
 using System.Drawing;
+
 using OpenCvSharp;
-using OpenCvSharp.Extensions;
+using OpenCvSharp.WpfExtensions;
+
+
 using Image = System.Windows.Controls.Image;
 using Color = System.Windows.Media.Color;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FastPuri
 {
     public partial class MainWindow : System.Windows.Window
     {
         string Defaultfilepath = null;
-        string[] Filepaths = {"Dammy"};
+        string[] Filepaths = { "Dammy" };
 
         int FileOrder = 0;
 
@@ -58,11 +62,11 @@ namespace FastPuri
 
             if (filedialog.ShowDialog() == true)
             {
-                Open_Savedialog(filedialog, 0, 0, true,true);
+                Open_Savedialog(filedialog, 0, 0, true, true);
             }
         }
 
-        private void Open_Savedialog(FileDialog filedialog,int new_fileorder,int old_fileorder,bool isloadarray,bool isload)
+        private void Open_Savedialog(FileDialog filedialog, int new_fileorder, int old_fileorder, bool isloadarray, bool isload)
         {
             //Array load cancel.
             bool load = isload;
@@ -106,7 +110,8 @@ namespace FastPuri
                 Filepaths = System.IO.Directory.GetFiles(Defaultfilepath, extension, System.IO.SearchOption.TopDirectoryOnly);
 
                 FileOrder = Array.IndexOf(Filepaths, filedialog.FileName);
-            }else if(isloadarray == false && load == true)
+            }
+            else if (isloadarray == false && load == true)
             {
                 FileOrder = new_fileorder;
             }
@@ -162,7 +167,7 @@ namespace FastPuri
                 btm.EndInit();
                 btm.Freeze();
 
-                Mat image = BitmapConverter.ToMat(new Bitmap(btm.StreamSource));
+                Mat image = BitmapSourceConverter.ToMat(btm);
 
                 //Apply print size setting.
                 System.Drawing.Size printsize = new System.Drawing.Size((int)btm.Width, (int)btm.Height);
@@ -171,45 +176,17 @@ namespace FastPuri
                 Mat main = CanvastoMat(MainCanvas, printsize, DPISize);
                 Mat outline = CanvastoMat(OutlineCanvas, printsize, DPISize);
 
-                Mat penresult = new Mat();
+                Mat result_pens = new Mat();
                 Mat result = new Mat();
-                Mat allresult = new Mat();
 
-                Cv2.Add(outline, main, penresult);
-                //Cv2.Add(result, penresult, allresult);
-                Bitmap tobitmap = BitmapConverter.ToBitmap(penresult, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                Cv2.Add(outline, main, result_pens);
+                Cv2.Add(image, result_pens, result);
+                BitmapSource tobitmap = BitmapSourceConverter.ToBitmapSource(result);
 
-                //FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-
-                //test
-                IntPtr hbit = tobitmap.GetHbitmap();
-                MainImage.Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hbit, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                //test end
-
-                MainCanvas.Strokes.Clear();
-                OutlineCanvas.Strokes.Clear();
-                
-                tobitmap.Save(Filepath + ".png",System.Drawing.Imaging.ImageFormat.Png);
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(tobitmap));
+                encoder.Save(str);
             }
-
-
-            /*
-            using (var os = new FileStream(Filepath, FileMode.Create))
-            {
-                Mat main = CanvastoMat(MainCanvas, printsize, DPISize);
-                Mat outline = CanvastoMat(OutlineCanvas, printsize, DPISize);
-
-                OpenCvSharp.
-
-                Mat result = null;
-                Bitmap tobitmap = null;
-                Cv2.Add(main, outline, result);
-                BitmapConverter.ToBitmap(result,tobitmap);
-
-                var encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(tobi));
-                encoder.Save(os);
-            }*/
 
             isPainting = false;
             LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
@@ -224,12 +201,17 @@ namespace FastPuri
                 var renderbtm = new RenderTargetBitmap((int)imagesize.Width, (int)imagesize.Height, imageDPIs.Width, imageDPIs.Height, PixelFormats.Pbgra32);
 
                 BitmapEncoder encoder = new BmpBitmapEncoder();
+                renderbtm.Render(canvas);
+
                 encoder.Frames.Add(BitmapFrame.Create(renderbtm));
                 encoder.Save(stream);
 
-                var btm = new System.Drawing.Bitmap(stream);
-                result = BitmapConverter.ToMat(btm);
+                BitmapImage btm = new BitmapImage();
+                btm.StreamSource = stream;
+                result = BitmapSourceConverter.ToMat(btm);
             }
+
+            //canvas.Strokes.Clear();
 
             return result;
         }
@@ -240,7 +222,7 @@ namespace FastPuri
             {
                 //This function summon is mouse event other possibility.
                 //if Mouse event only.
-                LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255,249, 248, 113));
+                LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 249, 248, 113));
                 isPainting = true;
             }
 

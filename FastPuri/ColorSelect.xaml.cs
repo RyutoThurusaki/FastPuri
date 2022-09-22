@@ -26,7 +26,7 @@ namespace FastPuri
             InitializeComponent();
 
             main = mainwindow;
-            
+
             timer.Interval = new TimeSpan(5);
             timer.Tick += new EventHandler(Palette_Update);
             timer.Start();
@@ -72,7 +72,7 @@ namespace FastPuri
             this.DialogResult = true;
             this.Close();
         }
-        
+
         void ColorSelect_Closing(object sender, ConsoleCancelEventArgs e)
         {
             timer.Tick -= new EventHandler(Palette_Update);

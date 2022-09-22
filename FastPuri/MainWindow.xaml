@@ -71,18 +71,17 @@
 
             </Canvas>
         </ScrollViewer>
-        <Image x:Name="Eraser" Source="/FastPuri_Eraser.png" Margin="139,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="2" Height="27" Width="27" IsHitTestVisible="False">
+        <Image x:Name="Eraser" Margin="139,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="2" Height="27" Width="27" IsHitTestVisible="False" Source="/FastPuri_Eraser.png">
             <Image.OpacityMask>
                 <ImageBrush ImageSource="/FastPuri_Eraser.png"/>
             </Image.OpacityMask>
         </Image>
-        <Image x:Name="Pen" Source="/FastPuri_Pen.png" Margin="171,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="2" Height="27" Width="27" IsHitTestVisible="False">
+        <Image x:Name="Pen" Margin="171,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="2" Height="27" Width="27" IsHitTestVisible="False" Source="/FastPuri_Pen.png">
             <Image.OpacityMask>
                 <ImageBrush ImageSource="/FastPuri_Pen.png"/>
             </Image.OpacityMask>
         </Image>
-        <Image x:Name="Pallet_Ichimatu_Copy" Margin="203,5,795,9"/>
-        <Image x:Name="Preview_Back" Source="/Ichimatu.png" Margin="203,5,0,0" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="1" Width="26" Height="27"/>
+        <Image x:Name="Preview_Back" Margin="203,5,0,0" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="1" Width="26" Height="27" Source="/Ichimatu.png"/>
         <Ellipse x:Name="Preview_Pen" Stroke="Black" Fill="White" StrokeThickness="4.5" Margin="205,7,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="22" Width="22" Panel.ZIndex="2"/>
     </Grid>
 </Window>
