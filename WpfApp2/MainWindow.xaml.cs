@@ -18,7 +18,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Ink;
-using Microsoft.VisualBasic.FileIO;
 using System.Drawing;
 
 using OpenCvSharp;
@@ -34,7 +33,7 @@ namespace FastPuri
     public partial class MainWindow : System.Windows.Window
     {
         string Defaultfilepath = null;
-        string[] Filepaths = { "Dammy" };
+        string[] Filepaths = { null };
 
         int FileOrder = 0;
 
@@ -158,34 +157,37 @@ namespace FastPuri
         {
             BitmapImage btm = new BitmapImage();
 
-            using (FileStream str = File.OpenRead(Filepath))
+            if (Filepath != null)
             {
-                btm.BeginInit();
-                btm.StreamSource = str;
-                btm.CacheOption = BitmapCacheOption.OnLoad;
-                btm.CreateOptions = BitmapCreateOptions.None;
-                btm.EndInit();
-                btm.Freeze();
+                using (FileStream str = File.OpenRead(Filepath))
+                {
+                    btm.BeginInit();
+                    btm.StreamSource = str;
+                    btm.CacheOption = BitmapCacheOption.OnLoad;
+                    btm.CreateOptions = BitmapCreateOptions.None;
+                    btm.EndInit();
+                    btm.Freeze();
 
-                Mat image = BitmapSourceConverter.ToMat(btm);
+                    Mat image = BitmapSourceConverter.ToMat(btm);
 
-                //Apply print size setting.
-                System.Drawing.Size printsize = new System.Drawing.Size((int)btm.Width, (int)btm.Height);
-                System.Drawing.Size DPISize = new System.Drawing.Size((int)btm.DpiX, (int)btm.DpiY);
+                    //Apply print size setting.
+                    System.Drawing.Size printsize = new System.Drawing.Size((int)btm.Width, (int)btm.Height);
+                    System.Drawing.Size DPISize = new System.Drawing.Size((int)btm.DpiX, (int)btm.DpiY);
 
-                Mat main = CanvastoMat(MainCanvas, printsize, DPISize);
-                Mat outline = CanvastoMat(OutlineCanvas, printsize, DPISize);
+                    Mat main = CanvastoMat(MainCanvas, printsize, DPISize);
+                    Mat outline = CanvastoMat(OutlineCanvas, printsize, DPISize);
 
-                Mat result_pens = new Mat();
-                Mat result = new Mat();
+                    Mat result_pens = new Mat();
+                    Mat result = new Mat();
 
-                Cv2.Add(outline, main, result_pens);
-                Cv2.Add(image, result_pens, result);
-                BitmapSource tobitmap = BitmapSourceConverter.ToBitmapSource(result);
+                    Cv2.Add(outline, main, result_pens);
+                    Cv2.Add(image, result_pens, result);
+                    BitmapSource tobitmap = BitmapSourceConverter.ToBitmapSource(result);
 
-                PngBitmapEncoder encoder = new PngBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(tobitmap));
-                encoder.Save(str);
+                    PngBitmapEncoder encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(tobitmap));
+                    encoder.Save(str);
+                }
             }
 
             isPainting = false;
