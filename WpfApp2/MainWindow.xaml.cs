@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Ink;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
@@ -27,6 +28,9 @@ using OpenCvSharp.WpfExtensions;
 using Image = System.Windows.Controls.Image;
 using Color = System.Windows.Media.Color;
 using static System.Net.Mime.MediaTypeNames;
+using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.InteropServices;
+using Microsoft.VisualBasic.FileIO;
 
 namespace FastPuri
 {
@@ -155,24 +159,20 @@ namespace FastPuri
 
         private void Save_Image(string Filepath)
         {
-            BitmapImage btm = new BitmapImage();
 
             if (Filepath != null)
             {
-                using (FileStream str = File.OpenRead(Filepath))
-                {
-                    btm.BeginInit();
-                    btm.StreamSource = str;
-                    btm.CacheOption = BitmapCacheOption.OnLoad;
-                    btm.CreateOptions = BitmapCreateOptions.None;
-                    btm.EndInit();
-                    btm.Freeze();
+                //FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 
-                    Mat image = BitmapSourceConverter.ToMat(btm);
+                using (FileStream str = new FileStream(Filepath, FileMode.Create))
+                {
+                    Mat src = MainImageBitmap.ToMat();
+                    Mat image = new Mat();
+                    Cv2.CvtColor(src, image, ColorConversionCodes.RGB2RGBA);
 
                     //Apply print size setting.
-                    System.Drawing.Size printsize = new System.Drawing.Size((int)btm.Width, (int)btm.Height);
-                    System.Drawing.Size DPISize = new System.Drawing.Size((int)btm.DpiX, (int)btm.DpiY);
+                    System.Drawing.Size printsize = new System.Drawing.Size((int)MainImageBitmap.Width, (int)MainImageBitmap.Height);
+                    System.Drawing.Size DPISize = new System.Drawing.Size((int)MainImageBitmap.DpiX, (int)MainImageBitmap.DpiY);
 
                     Mat main = CanvastoMat(MainCanvas, printsize, DPISize);
                     Mat outline = CanvastoMat(OutlineCanvas, printsize, DPISize);
@@ -187,6 +187,8 @@ namespace FastPuri
                     PngBitmapEncoder encoder = new PngBitmapEncoder();
                     encoder.Frames.Add(BitmapFrame.Create(tobitmap));
                     encoder.Save(str);
+
+                    MainImage.Source = tobitmap;
                 }
             }
 
@@ -197,10 +199,13 @@ namespace FastPuri
         public Mat CanvastoMat(InkCanvas canvas, System.Drawing.Size imagesize, System.Drawing.Size imageDPIs)
         {
             Mat result = new Mat();
+            MemoryStream str = new MemoryStream();
 
             using (var stream = new MemoryStream())
             {
-                var renderbtm = new RenderTargetBitmap((int)imagesize.Width, (int)imagesize.Height, imageDPIs.Width, imageDPIs.Height, PixelFormats.Pbgra32);
+                var renderbtm = new RenderTargetBitmap
+                    ((int)imagesize.Width, (int)imagesize.Height, imageDPIs.Width, imageDPIs.Height, PixelFormats.Pbgra32);
+
 
                 BitmapEncoder encoder = new BmpBitmapEncoder();
                 renderbtm.Render(canvas);
@@ -208,12 +213,13 @@ namespace FastPuri
                 encoder.Frames.Add(BitmapFrame.Create(renderbtm));
                 encoder.Save(stream);
 
-                BitmapImage btm = new BitmapImage();
-                btm.StreamSource = stream;
-                result = BitmapSourceConverter.ToMat(btm);
+                stream.CopyTo(str);
+
+                Bitmap btm = new Bitmap(stream);
+                result = BitmapSourceConverter.ToMat(btm.ToBitmapSource());
             }
 
-            //canvas.Strokes.Clear();
+            canvas.Strokes.Clear();
 
             return result;
         }
@@ -293,6 +299,8 @@ namespace FastPuri
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             Save_Image(Filepaths[FileOrder]);
+
+            Open_Savedialog(null, FileOrder, FileOrder, false, true);
         }
 
         private void ColorSelect_Click(object sender, RoutedEventArgs e)
