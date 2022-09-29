@@ -24,13 +24,13 @@ using System.Drawing.Imaging;
 using OpenCvSharp;
 using OpenCvSharp.WpfExtensions;
 
-
 using Image = System.Windows.Controls.Image;
 using Color = System.Windows.Media.Color;
 using static System.Net.Mime.MediaTypeNames;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
 using Microsoft.VisualBasic.FileIO;
+using System.Web;
 
 namespace FastPuri
 {
@@ -162,11 +162,9 @@ namespace FastPuri
 
             if (Filepath != null)
             {
-                //FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-
                 using (FileStream str = new FileStream(Filepath, FileMode.Create))
                 {
-                    Mat src = MainImageBitmap.ToMat();
+                    Mat src = new OpenCvSharp.
                     Mat image = new Mat();
                     Cv2.CvtColor(src, image, ColorConversionCodes.RGB2RGBA);
 
@@ -184,16 +182,22 @@ namespace FastPuri
                     Cv2.Add(image, result_pens, result);
                     BitmapSource tobitmap = BitmapSourceConverter.ToBitmapSource(result);
 
+                    FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+
+                    result.ImWrite(Filepath);
+                    /*
                     PngBitmapEncoder encoder = new PngBitmapEncoder();
                     encoder.Frames.Add(BitmapFrame.Create(tobitmap));
                     encoder.Save(str);
+                    */
 
                     MainImage.Source = tobitmap;
-                }
-            }
 
-            isPainting = false;
-            LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
+                    isPainting = false;
+                    LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
+                }
+
+            }
         }
 
         public Mat CanvastoMat(InkCanvas canvas, System.Drawing.Size imagesize, System.Drawing.Size imageDPIs)
