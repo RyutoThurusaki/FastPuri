@@ -20,10 +20,6 @@ using System.Windows.Shapes;
 using System.Windows.Ink;
 using System.Drawing;
 using System.Drawing.Imaging;
-
-using OpenCvSharp;
-using OpenCvSharp.WpfExtensions;
-
 using Image = System.Windows.Controls.Image;
 using Color = System.Windows.Media.Color;
 using static System.Net.Mime.MediaTypeNames;
@@ -31,6 +27,7 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
 using Microsoft.VisualBasic.FileIO;
 using System.Web;
+using System.Drawing.Drawing2D;
 
 namespace FastPuri
 {
@@ -162,47 +159,64 @@ namespace FastPuri
 
             if (Filepath != null)
             {
-                using (FileStream str = new FileStream(Filepath, FileMode.Create))
-                {
-                    Mat src = new OpenCvSharp.
-                    Mat image = new Mat();
-                    Cv2.CvtColor(src, image, ColorConversionCodes.RGB2RGBA);
+                Bitmap image;
 
+                using (FileStream str = new FileStream(Filepath, FileMode.Open, FileAccess.Read))
+                {
+                    image = new Bitmap(str);
+
+                    str.Close();
+                }
+
+                FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+
+                using (FileStream str = new FileStream(Filepath, FileMode.Create,FileAccess.ReadWrite))
+                {
                     //Apply print size setting.
                     System.Drawing.Size printsize = new System.Drawing.Size((int)MainImageBitmap.Width, (int)MainImageBitmap.Height);
                     System.Drawing.Size DPISize = new System.Drawing.Size((int)MainImageBitmap.DpiX, (int)MainImageBitmap.DpiY);
 
-                    Mat main = CanvastoMat(MainCanvas, printsize, DPISize);
-                    Mat outline = CanvastoMat(OutlineCanvas, printsize, DPISize);
+                    Bitmap main = Canvas2Bitmap(MainCanvas, printsize, DPISize);
+                    Bitmap outline = Canvas2Bitmap(OutlineCanvas, printsize, DPISize);
 
-                    Mat result_pens = new Mat();
-                    Mat result = new Mat();
+                    Graphics g = Graphics.FromImage(image);
+                    g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
 
-                    Cv2.Add(outline, main, result_pens);
-                    Cv2.Add(image, result_pens, result);
-                    BitmapSource tobitmap = BitmapSourceConverter.ToBitmapSource(result);
+                    System.Drawing.Color color = System.Drawing.Color.FromArgb(0,0,0,0);
 
-                    FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                    outline.MakeTransparent(color);
+                    main.MakeTransparent(color);
+                    g.DrawImage(outline, 0,0);
+                    g.DrawImage(main,0,0);
+                    g.Save();
 
-                    result.ImWrite(Filepath);
-                    /*
-                    PngBitmapEncoder encoder = new PngBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(tobitmap));
-                    encoder.Save(str);
-                    */
-
-                    MainImage.Source = tobitmap;
+                    Bitmap dst = new Bitmap(image);
+                    dst.Save(str, ImageFormat.Png);
 
                     isPainting = false;
                     LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
+
+                    str.Close();
                 }
 
+                BitmapImage btm = new BitmapImage();
+
+                using (FileStream str = File.OpenRead(Filepath))
+                {
+                    btm.BeginInit();
+                    btm.StreamSource = str;
+                    btm.CacheOption = BitmapCacheOption.OnLoad;
+                    btm.CreateOptions = BitmapCreateOptions.None;
+                    btm.EndInit();
+                    btm.Freeze();
+                }
+                MainImage.Source = btm;
             }
         }
 
-        public Mat CanvastoMat(InkCanvas canvas, System.Drawing.Size imagesize, System.Drawing.Size imageDPIs)
+        public Bitmap Canvas2Bitmap(InkCanvas canvas, System.Drawing.Size imagesize, System.Drawing.Size imageDPIs)
         {
-            Mat result = new Mat();
+            Bitmap result;
             MemoryStream str = new MemoryStream();
 
             using (var stream = new MemoryStream())
@@ -217,10 +231,7 @@ namespace FastPuri
                 encoder.Frames.Add(BitmapFrame.Create(renderbtm));
                 encoder.Save(stream);
 
-                stream.CopyTo(str);
-
-                Bitmap btm = new Bitmap(stream);
-                result = BitmapSourceConverter.ToMat(btm.ToBitmapSource());
+                result = new Bitmap(stream);
             }
 
             canvas.Strokes.Clear();
