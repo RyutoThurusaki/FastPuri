@@ -20,10 +20,6 @@ using System.Windows.Shapes;
 using System.Windows.Ink;
 using System.Drawing;
 using System.Drawing.Imaging;
-
-using OpenCvSharp;
-using OpenCvSharp.WpfExtensions;
-
 using Image = System.Windows.Controls.Image;
 using Color = System.Windows.Media.Color;
 using static System.Net.Mime.MediaTypeNames;
@@ -186,7 +182,7 @@ namespace FastPuri
                     Graphics g = Graphics.FromImage(image);
                     g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
 
-                    System.Drawing.Color color = System.Drawing.Color.FromArgb(255,0,0,0);
+                    System.Drawing.Color color = System.Drawing.Color.FromArgb(0,0,0,0);
 
                     outline.MakeTransparent(color);
                     main.MakeTransparent(color);
@@ -196,19 +192,25 @@ namespace FastPuri
 
                     Bitmap dst = new Bitmap(image);
                     dst.Save(str, ImageFormat.Png);
-                    /*
-                    PngBitmapEncoder encoder = new PngBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(tobitmap));
-                    encoder.Save(str);
-                    */
 
-                    MainImage.Source = dst.ToBitmapSource();
                     isPainting = false;
                     LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
 
                     str.Close();
                 }
 
+                BitmapImage btm = new BitmapImage();
+
+                using (FileStream str = File.OpenRead(Filepath))
+                {
+                    btm.BeginInit();
+                    btm.StreamSource = str;
+                    btm.CacheOption = BitmapCacheOption.OnLoad;
+                    btm.CreateOptions = BitmapCreateOptions.None;
+                    btm.EndInit();
+                    btm.Freeze();
+                }
+                MainImage.Source = btm;
             }
         }
 
