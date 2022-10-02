@@ -65,5 +65,4 @@
   
 ## Thanks!!
 
-### [OpenCVSharp](https://github.com/shimat/opencvsharp)
 ### [MaterialDesignInXAML](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
