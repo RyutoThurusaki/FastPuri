@@ -148,6 +148,37 @@ namespace FastPuri
 
                     canvas.Height = MainImageBitmap.Height;
                     canvas.Width = MainImageBitmap.Width;
+
+
+                    //Canvas change scale.
+                    Rect ViewRect = new Rect();
+                    ViewRect.Width = ScrollViewer.ActualWidth;
+                    ViewRect.Height = ScrollViewer.ActualHeight;
+
+                    Rect ImageRect = new Rect();
+                    ImageRect.Width = MainImageBitmap.Width;
+                    ImageRect.Height = MainImageBitmap.Height;
+
+                    Rect ResultRect = new Rect();
+                    ResultRect.Width = ViewRect.Width / ImageRect.Width;
+                    ResultRect.Height = ViewRect.Height / ImageRect.Height;
+
+                    float Scale = 0;
+
+                    switch (ResultRect.Width.CompareTo(ResultRect.Height))
+                    {
+                        case 0:
+                            Scale = (float)ResultRect.Height;
+                            break;
+                        case 1:
+                            Scale = (float)ResultRect.Height;
+                            break;
+                        case -1:
+                            Scale = (float)ResultRect.Width;
+                            break ;
+                    }
+
+                    slider.Value = Scale;
                 }
                 else
                 {
