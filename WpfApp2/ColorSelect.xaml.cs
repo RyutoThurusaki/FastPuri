@@ -37,6 +37,7 @@ namespace FastPuri
             Slider_Pen.Value = main.pensize;
             Slider_Outline.Value = main.outlinesize;
 
+            SelectButton = Button_PenColor;
             Button_PenColor_Click(null, null);
         }
 

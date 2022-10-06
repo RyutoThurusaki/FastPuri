@@ -28,6 +28,8 @@ using System.Runtime.InteropServices;
 using Microsoft.VisualBasic.FileIO;
 using System.Web;
 using System.Drawing.Drawing2D;
+using System.Windows.Media.Animation;
+using System.Security.AccessControl;
 
 namespace FastPuri
 {
@@ -156,8 +158,9 @@ namespace FastPuri
 
         private void Save_Image(string Filepath)
         {
+            ShowInfomation("セーブ中…");
 
-            if (Filepath != null)
+            if (File.Exists(Filepath))
             {
                 Bitmap image;
 
@@ -210,7 +213,13 @@ namespace FastPuri
                     btm.EndInit();
                     btm.Freeze();
                 }
+
+                ShowInfomation("セーブしました");
                 MainImage.Source = btm;
+            }
+            else
+            {
+                ShowInfomation("セーブに失敗しました");
             }
         }
 
@@ -299,16 +308,20 @@ namespace FastPuri
             if (isPointErace)
             {
                 MainCanvas.EditingMode = InkCanvasEditingMode.EraseByPoint;
+                ShowInfomation("ポイント消しゴム");
             }
             else
             {
                 MainCanvas.EditingMode = InkCanvasEditingMode.EraseByStroke;
+                ShowInfomation("ストローク消しゴム");
             }
         }
 
         private void Mode_Pen_Click(object sender, RoutedEventArgs e)
         {
             MainCanvas.EditingMode = InkCanvasEditingMode.Ink;
+
+            ShowInfomation("ペン");
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -339,6 +352,17 @@ namespace FastPuri
             {
                 //Do not
             }
+        }
+
+        private void ShowInfomation(string message)
+        {
+            Popup_Text.Content = message;
+            DoubleAnimation animation = new DoubleAnimation();
+            animation.From = 1;
+            animation.To = 0;
+            animation.Duration = new Duration(TimeSpan.FromSeconds(3));
+
+            Popup_Infomation.BeginAnimation(Button.OpacityProperty, animation);
         }
     }
 }
