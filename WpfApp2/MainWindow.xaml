@@ -82,8 +82,8 @@
         </Image>
         <Image x:Name="Preview_Back" Margin="203,5,0,0" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="1" Width="26" Height="27" Source="/Ichimatu.png"/>
         <Ellipse x:Name="Preview_Pen" Stroke="Black" Fill="White" StrokeThickness="4.5" Margin="205,7,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="22" Width="22" Panel.ZIndex="2"/>
-        <Border x:Name="Popup_Infomation" BorderThickness="1" CornerRadius="25,25,25,25" Margin="245,20,245,0" Grid.Row="1" Height="50" Background="#7F000000" Panel.ZIndex="5" VerticalAlignment="Top" Width="500" Opacity="0" HorizontalAlignment="Center">
-            <Label x:Name="Popup_Text" HorizontalContentAlignment="Center" FontSize="24" Foreground="White" VerticalContentAlignment="Center" Background="{x:Null}" Content="Hogehoge" Height="45" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Border x:Name="Popup_Infomation" BorderThickness="1" CornerRadius="25,25,25,25" Margin="245,20,245,0" Grid.Row="1" Height="50" Background="#7F000000" Panel.ZIndex="5" VerticalAlignment="Top" Width="500" Opacity="0" HorizontalAlignment="Center" IsHitTestVisible="False">
+            <Label x:Name="Popup_Text" HorizontalContentAlignment="Center" FontSize="24" Foreground="White" VerticalContentAlignment="Center" Background="{x:Null}" Content="Hogehoge" Height="45" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"/>
         </Border>
     </Grid>
 </Window>
