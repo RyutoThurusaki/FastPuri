@@ -43,12 +43,30 @@ namespace FastPuri
 
         private void Palette_Update(object sender, EventArgs e)
         {
+            var mybrush = new SolidColorBrush(ColorPicker.Color);
+
             //ColorPalette update
+            //Apply pencolor to button
             if (SelectButton != null)
             {
-                var mybrush = new SolidColorBrush(ColorPicker.Color);
                 SelectButton.Background = mybrush;
             }
+
+            //Apply brushsize to preview
+            int size = (int)Slider_Pen.Value + (int)Slider_Outline.Value;
+            Preview_Pen.Width = size;
+            Preview_Pen.Height = size;
+            Preview_Pen.StrokeThickness = (int)Slider_Outline.Value / 2;
+
+            //Apply brushcolor to preview
+            if (SelectButton == Button_PenColor)
+            {
+                Preview_Pen.Fill = mybrush;
+            }else if (SelectButton == Button_OutlineColor)
+            {
+                Preview_Pen.Stroke = mybrush;
+            }
+
         }
 
         private void Button_PenColor_Click(object sender, RoutedEventArgs e)
