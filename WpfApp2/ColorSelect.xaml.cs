@@ -53,10 +53,9 @@ namespace FastPuri
             }
 
             //Apply brushsize to preview
-            int size = (int)Slider_Pen.Value + (int)Slider_Outline.Value;
-            Preview_Pen.Width = size;
-            Preview_Pen.Height = size;
-            Preview_Pen.StrokeThickness = (int)Slider_Outline.Value / 2;
+            float size = ((float)Slider_Pen.Value + (float)Slider_Outline.Value / 100);
+            Preview_Pen.RenderTransform.Value.Scale(size, size);
+            Preview_Pen.StrokeThickness = (Slider_Outline.Value * 0.5);
 
             //Apply brushcolor to preview
             if (SelectButton == Button_PenColor)
