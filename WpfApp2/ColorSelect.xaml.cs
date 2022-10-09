@@ -34,11 +34,17 @@ namespace FastPuri
             //Current pen setting into variable.
             Button_PenColor.Background = new SolidColorBrush(main.color_pen);
             Button_OutlineColor.Background = new SolidColorBrush(main.color_outline);
+
+            Preview_Pen.Fill = new SolidColorBrush(main.color_pen);
+            Preview_Pen.Stroke = new SolidColorBrush(main.color_outline);
+
             Slider_Pen.Value = main.pensize;
             Slider_Outline.Value = main.outlinesize;
 
+
             SelectButton = Button_PenColor;
             Button_PenColor_Click(null, null);
+
         }
 
         private void Palette_Update(object sender, EventArgs e)
@@ -53,7 +59,7 @@ namespace FastPuri
             }
 
             //Apply brushsize to preview
-            float size = ((float)Slider_Pen.Value + (float)Slider_Outline.Value / 100);
+            float size = ((float)Slider_Pen.Value + (float)Slider_Outline.Value * 0.001f);
             Preview_Pen.RenderTransform.Value.Scale(size, size);
             Preview_Pen.StrokeThickness = (Slider_Outline.Value * 0.5);
 

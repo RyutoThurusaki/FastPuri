@@ -43,8 +43,8 @@ namespace FastPuri
         bool isPainting = false;
         bool isPointErace = false;
 
-        public Color color_pen;
-        public Color color_outline;
+        public Color color_pen = Colors.Black;
+        public Color color_outline = Colors.White;
         public int pensize;
         public int outlinesize;
 
