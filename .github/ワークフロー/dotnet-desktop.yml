@@ -60,7 +60,7 @@ Solution_Name: WpfNetCoreApp1.sln
 Test_Project_Path: NUnitTestProject1\NUnitTestProject1.csproj
 Wap_Project_Directory: WapProjTemplate1
 Wap_Project_Path: WapProjTemplate1\WapProjTemplate1.wapproj
-      Signing_Certificate: GitHubActionsWorkflow.pfx
+      Signing_Certificate: .github/workflows/dotnet-desktop.yml
 
     steps:
     - name: Checkout
