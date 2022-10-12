@@ -34,21 +34,46 @@ namespace FastPuri
             //Current pen setting into variable.
             Button_PenColor.Background = new SolidColorBrush(main.color_pen);
             Button_OutlineColor.Background = new SolidColorBrush(main.color_outline);
+
+            Preview_Pen.Fill = new SolidColorBrush(main.color_pen);
+            Preview_Pen.Stroke = new SolidColorBrush(main.color_outline);
+
             Slider_Pen.Value = main.pensize;
             Slider_Outline.Value = main.outlinesize;
 
+
             SelectButton = Button_PenColor;
             Button_PenColor_Click(null, null);
+
         }
 
         private void Palette_Update(object sender, EventArgs e)
         {
+            var mybrush = new SolidColorBrush(ColorPicker.Color);
+
             //ColorPalette update
+            //Apply pencolor to button
             if (SelectButton != null)
             {
-                var mybrush = new SolidColorBrush(ColorPicker.Color);
                 SelectButton.Background = mybrush;
             }
+
+            //Apply brushsize to preview
+            float Pensize = ((float)Slider_Pen.Value * 0.01f);
+            float Outsize = (((float)Slider_Pen.Value + (float)Slider_Outline.Value) * 0.01f);
+            Preview_Pen.RenderTransform = new ScaleTransform(Pensize, Pensize);
+            Preview_Outline.RenderTransform = new ScaleTransform(Outsize, Outsize);
+
+            //Apply brushcolor to preview
+            if (SelectButton == Button_PenColor)
+            {
+                Preview_Pen.Fill = mybrush;
+            }
+            else if (SelectButton == Button_OutlineColor)
+            {
+                Preview_Outline.Fill = mybrush;
+            }
+
         }
 
         private void Button_PenColor_Click(object sender, RoutedEventArgs e)

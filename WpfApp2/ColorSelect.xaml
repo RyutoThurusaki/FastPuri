@@ -14,7 +14,7 @@
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}">
+        FontFamily="{DynamicResource MaterialDesignFont}" ResizeMode="NoResize" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
 
     <Window.Resources>
         <sys:Double x:Key="EllipseWidth">20.0</sys:Double>
@@ -23,34 +23,45 @@
         <SolidColorBrush x:Key="TextColor" Color="#FAF7FF"/>
     </Window.Resources>
 
-    <Grid>
+    <Grid Height="434">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="721*"/>
-            <ColumnDefinition Width="79*"/>
+            <ColumnDefinition Width="322"/>
+            <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
 
-        <materialDesign:ColorPicker x:Name="ColorPicker"  Margin="10,10,10,0" Grid.ColumnSpan="2" Height="255" VerticalAlignment="Top"/>
-        <Label Content="PenColor" HorizontalAlignment="Left" Margin="6,272,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
-        <Label Content="OutlineColor" HorizontalAlignment="Left" Margin="110,272,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
-        <Button x:Name="Button_PenColor" Click="Button_PenColor_Click" Content="" Margin="10,299,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="93" Background="Black"/>
-        <Button x:Name="Button_OutlineColor" Click="Button_OutlineColor_Click" Content="" Margin="114,299,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="93" Background="White"/>
-        <Button x:Name="Button_Apply" Click="Button_Apply_Click" Content="OK" HorizontalAlignment="Right" Margin="0,380,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="67" Foreground="White"/>
-        <Button x:Name="Button_PenPreview" HorizontalAlignment="Right" Margin="0,299,10,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="67" Width="67">
-            <Button.Background>
-                <RadialGradientBrush SpreadMethod="Pad" MappingMode="RelativeToBoundingBox">
-                    <GradientStop Color="Black" Offset="0.403"/>
-                    <GradientStop Color="White" Offset="0.423"/>
-                    <GradientStop Color="Transparent" Offset="0.607"/>
-                    <GradientStop Color="White" Offset="0.58"/>
-                </RadialGradientBrush>
-            </Button.Background>
-        </Button>
-        <Image Source="/Ichimatu.png" Margin="0,299,10,0" Grid.ColumnSpan="2" IsHitTestVisible="False" HorizontalAlignment="Right" VerticalAlignment="Top" Panel.ZIndex="-1" Width="67" Height="67"/>
-        <Label Content="PenSize" HorizontalAlignment="Left" Margin="6,358,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
-        <Label Content="OutlineSize" HorizontalAlignment="Left" Margin="109,358,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left"/>
-        <Slider x:Name="Slider_Pen" HorizontalAlignment="Left" Margin="10,386,0,0" VerticalAlignment="Top" Width="93" Maximum="40" Minimum="2"/>
-        <Slider x:Name="Slider_Outline" HorizontalAlignment="Left" Margin="114,386,0,0" VerticalAlignment="Top" Width="92" Maximum="27"/>
-        <Label Content="Preview" HorizontalAlignment="Right" Margin="0,272,31,0" VerticalAlignment="Top" HorizontalContentAlignment="Left" Grid.ColumnSpan="2"/>
+        <materialDesign:ColorPicker x:Name="ColorPicker"  Margin="0,10,0,0" Height="255" VerticalAlignment="Top" HorizontalAlignment="Center" Width="300"/>
+        <Label Content="PenColor" HorizontalAlignment="Left" Margin="6,272,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left" Height="22" Width="57"/>
+        <Label Content="OutlineColor" HorizontalAlignment="Left" Margin="110,272,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left" Height="22" Width="74"/>
+        <Button x:Name="Button_PenColor" Click="Button_PenColor_Click" Content="" Margin="10,299,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="93" Background="Black" Height="32"/>
+        <Button x:Name="Button_OutlineColor" Click="Button_OutlineColor_Click" Content="" Margin="0,299,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Width="94" Background="White" Height="32"/>
+        <Button x:Name="Button_Apply" Click="Button_Apply_Click" Content="OK" HorizontalAlignment="Left" Margin="244,380,0,0" VerticalAlignment="Top" Width="67" Foreground="White" Height="32"/>
+        <Button x:Name="Button_PenPreview" HorizontalAlignment="Left" Margin="244,299,0,0" VerticalAlignment="Top" Height="67" Width="67" Background="{x:Null}"/>
+        <Image Source="/Ichimatu.png" Margin="244,299,0,0" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="-1" Width="66" Height="67"/>
+        <Label Content="PenSize" HorizontalAlignment="Left" Margin="6,358,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left" Height="22" Width="51"/>
+        <Label Content="OutlineSize" HorizontalAlignment="Left" Margin="109,358,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left" Height="22" Width="68"/>
+        <Slider x:Name="Slider_Pen" HorizontalAlignment="Left" Margin="10,386,0,0" VerticalAlignment="Top" Width="93" Maximum="33" Minimum="1" SmallChange="1" Height="20"/>
+        <Slider x:Name="Slider_Outline" HorizontalAlignment="Center" Margin="0,386,0,0" VerticalAlignment="Top" Width="92" Maximum="33" SmallChange="1" Height="20"/>
+        <Label Content="Preview" HorizontalAlignment="Left" Margin="238,272,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Left" Height="22" Width="50"/>
+        <Ellipse x:Name="Preview_Pen" Fill="Black" Panel.ZIndex="5" Margin="227,283,0,0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Width="100" Height="100" VerticalAlignment="Top" OverridesDefaultStyle="True" Grid.ColumnSpan="2">
+            <Ellipse.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="0.2" ScaleY="0.2"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Ellipse.RenderTransform>
+        </Ellipse>
+        <Ellipse x:Name="Preview_Outline" Fill="White" Panel.ZIndex="4" Margin="227,283,0,0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Width="100" Height="100" VerticalAlignment="Top" OverridesDefaultStyle="True" Grid.ColumnSpan="2">
+            <Ellipse.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="0.3" ScaleY="0.3"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Ellipse.RenderTransform>
+        </Ellipse>
 
     </Grid>
 </Window>
