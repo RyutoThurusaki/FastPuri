@@ -36,6 +36,7 @@ namespace FastPuri
 {
     public partial class MainWindow : System.Windows.Window
     {
+        //焼いて
         string Defaultfilepath = null;
         string[] Filepaths = { null };
 
