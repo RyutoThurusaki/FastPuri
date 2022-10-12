@@ -59,17 +59,19 @@ namespace FastPuri
             }
 
             //Apply brushsize to preview
-            float size = ((float)Slider_Pen.Value + (float)Slider_Outline.Value * 0.001f);
-            Preview_Pen.RenderTransform.Value.Scale(size, size);
-            Preview_Pen.StrokeThickness = (Slider_Outline.Value * 0.5);
+            float Pensize = ((float)Slider_Pen.Value * 0.01f);
+            float Outsize = (((float)Slider_Pen.Value + (float)Slider_Outline.Value) * 0.01f);
+            Preview_Pen.RenderTransform = new ScaleTransform(Pensize, Pensize);
+            Preview_Outline.RenderTransform = new ScaleTransform(Outsize, Outsize);
 
             //Apply brushcolor to preview
             if (SelectButton == Button_PenColor)
             {
                 Preview_Pen.Fill = mybrush;
-            }else if (SelectButton == Button_OutlineColor)
+            }
+            else if (SelectButton == Button_OutlineColor)
             {
-                Preview_Pen.Stroke = mybrush;
+                Preview_Outline.Fill = mybrush;
             }
 
         }
