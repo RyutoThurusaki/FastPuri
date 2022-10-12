@@ -30,6 +30,7 @@ using System.Web;
 using System.Drawing.Drawing2D;
 using System.Windows.Media.Animation;
 using System.Security.AccessControl;
+using System.Web.UI.WebControls;
 
 namespace FastPuri
 {
@@ -42,6 +43,7 @@ namespace FastPuri
 
         bool isPainting = false;
         bool isPointErace = false;
+        bool isAllextention = true;
 
         public Color color_pen = Colors.Black;
         public Color color_outline = Colors.White;
@@ -68,10 +70,10 @@ namespace FastPuri
             }
         }
 
-        private void Open_Savedialog(FileDialog filedialog, int new_fileorder, int old_fileorder, bool isloadarray, bool isload)
+        private void Open_Savedialog(FileDialog filedialog, int new_fileorder, int old_fileorder, bool isloadarray, bool isloadimage)
         {
             //Array load cancel.
-            bool load = isload;
+            bool isload = isloadimage;
 
             //Ask if want to save image.
             if (isPainting)
@@ -80,13 +82,13 @@ namespace FastPuri
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    load = true;
+                    isload = true;
 
                     Save_Image(Filepaths[old_fileorder]);
                 }
                 else if (result == MessageBoxResult.No)
                 {
-                    load = true;
+                    isload = true;
                     isPainting = false;
                     LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
 
@@ -95,31 +97,48 @@ namespace FastPuri
                 }
                 else if (result == MessageBoxResult.Cancel)
                 {
-                    load = false;
+                    isload = false;
                     //do not
                 }
             }
 
             //Reload file pathes in array.
-            if (isloadarray == true && load == true)
+            if (isloadarray == true && isload == true)
             {
                 // Save directory path.
                 FileInfo fi = new FileInfo(filedialog.FileName);
                 Defaultfilepath = fi.DirectoryName;
 
                 //Get all files path.Find the index for the opening file.
-                string extension = "*" + System.IO.Path.GetExtension(filedialog.FileName);
-                Filepaths = System.IO.Directory.GetFiles(Defaultfilepath, extension, System.IO.SearchOption.TopDirectoryOnly);
+                if (isAllextention)
+                {
+                    string[] src_jpg = System.IO.Directory.GetFiles(Defaultfilepath, "*.jpg", System.IO.SearchOption.TopDirectoryOnly);
+                    string[] src_jpeg = System.IO.Directory.GetFiles(Defaultfilepath, "*.jpeg", System.IO.SearchOption.TopDirectoryOnly);
+                    string[] src_png = System.IO.Directory.GetFiles(Defaultfilepath, "*.png", System.IO.SearchOption.TopDirectoryOnly);
+
+                    string[] dst = new string[src_jpg.Length + src_jpeg.Length + src_png.Length];
+
+                    src_jpg.CopyTo(dst, 0);
+                    src_jpeg.CopyTo(dst, src_jpg.Length);
+                    src_png.CopyTo(dst,src_jpg.Length+src_jpeg.Length);
+
+                    Filepaths = dst;
+                }
+                else
+                {
+                    string extension = "*" + System.IO.Path.GetExtension(filedialog.FileName);
+                    Filepaths = System.IO.Directory.GetFiles(Defaultfilepath, extension, System.IO.SearchOption.TopDirectoryOnly);
+                }
 
                 FileOrder = Array.IndexOf(Filepaths, filedialog.FileName);
             }
-            else if (isloadarray == false && load == true)
+            else if (isloadarray == false && isload == true)
             {
                 FileOrder = new_fileorder;
             }
 
             //Image opening to canvas.
-            if (load)
+            if (isload)
             {
                 //Null check.
                 if (System.IO.File.Exists(Filepaths[FileOrder]))
@@ -218,14 +237,31 @@ namespace FastPuri
 
                     System.Drawing.Color color = System.Drawing.Color.FromArgb(0,0,0,0);
 
+                    //rendering
                     outline.MakeTransparent(color);
                     main.MakeTransparent(color);
                     g.DrawImage(outline, 0,0);
                     g.DrawImage(main,0,0);
                     g.Save();
 
+                    //A choose format from extention
+                    ImageFormat format = null;
+
+                    switch (System.IO.Path.GetExtension(Filepath))
+                    {
+                        case ".jpg":
+                            format = ImageFormat.Jpeg;
+                            break;
+                        case ".jpeg":
+                            format = ImageFormat.Jpeg;
+                            break;
+                        case ".png":
+                            format = ImageFormat.Png;
+                            break;
+                    }
+
                     Bitmap dst = new Bitmap(image);
-                    dst.Save(str, ImageFormat.Png);
+                    dst.Save(str, format);
 
                     isPainting = false;
                     LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
@@ -393,7 +429,7 @@ namespace FastPuri
             animation.To = 0;
             animation.Duration = new Duration(TimeSpan.FromSeconds(3));
 
-            Popup_Infomation.BeginAnimation(Button.OpacityProperty, animation);
+            Popup_Infomation.BeginAnimation(System.Windows.Controls.Button.OpacityProperty, animation);
         }
     }
 }
