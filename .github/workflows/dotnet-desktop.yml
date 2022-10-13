@@ -39,13 +39,9 @@
 name: .NET Core Desktop
 
 on:
-  push:
-    branches: [ "ActionEdit" ]
-    # ここの上は消す
-
   pull_request:
     types: [closed]
-    branches: [ "ActionEdit" ]
+    branches: [ "main" ]
     # mainブランチにプッシュする前にかならず確認
 
 jobs:
@@ -123,6 +119,12 @@ jobs:
         path: WpfApp2\bin\Release\FastPuri.exe
         # 出力したいファイルのパス
 
+    # Release exe file
+    - name: Release exe
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/NewRelease')
+      with:
+        files: WpfApp2\bin\Release\FastPuri.exe
 
   update_release_draft:
     permissions:
