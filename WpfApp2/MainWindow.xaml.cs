@@ -36,6 +36,7 @@ namespace FastPuri
 {
     public partial class MainWindow : System.Windows.Window
     {
+        //布団が吹っ飛んだ
         string Defaultfilepath = null;
         string[] Filepaths = { null };
 
