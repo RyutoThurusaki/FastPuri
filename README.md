@@ -66,3 +66,4 @@
 ## Thanks!!
 
 ### [MaterialDesignInXAML](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
+### [Costura.Fody](https://github.com/Fody/Costura)
