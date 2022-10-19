@@ -60,12 +60,12 @@
 
                 <Image x:Name="MainImage"/>
 
-                <InkCanvas x:Name="OutlineCanvas" ClipToBounds="False" ResizeEnabled="False" MoveEnabled="False" Background="{x:Null}" ScrollViewer.HorizontalScrollBarVisibility="Visible" EditingModeInverted="Ink">
-                    <Canvas/>
+                <InkCanvas x:Name="OutlineCanvas" ClipToBounds="False" ResizeEnabled="False" MoveEnabled="False" Background="#00000000" ScrollViewer.HorizontalScrollBarVisibility="Visible" EditingModeInverted="Ink">
+                    <Canvas Background="#00000000"/>
                 </InkCanvas>
 
-                <InkCanvas x:Name="MainCanvas"  PreviewMouseUp="MainCanvas_PreviewMouseUp" ClipToBounds="False" ResizeEnabled="False" MoveEnabled="False" Background="{x:Null}" ScrollViewer.HorizontalScrollBarVisibility="Visible" EditingModeInverted="Ink">
-                    <Canvas/>
+                <InkCanvas x:Name="MainCanvas"  PreviewMouseUp="MainCanvas_PreviewMouseUp" ClipToBounds="False" ResizeEnabled="False" MoveEnabled="False" Background="#00000000" ScrollViewer.HorizontalScrollBarVisibility="Visible" EditingModeInverted="Ink">
+                    <Canvas Background="#00000000"/>
                 </InkCanvas>
 
             </Canvas>
