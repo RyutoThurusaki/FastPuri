@@ -31,6 +31,10 @@ using System.Drawing.Drawing2D;
 using System.Windows.Media.Animation;
 using System.Security.AccessControl;
 using System.Web.UI.WebControls;
+using System.Security.Policy;
+using Rectangle = System.Drawing.Rectangle;
+using System.Globalization;
+using Microsoft.SqlServer.Server;
 
 namespace FastPuri
 {
@@ -224,52 +228,57 @@ namespace FastPuri
 
                 FileSystem.DeleteFile(Filepath, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 
-                using (FileStream str = new FileStream(Filepath, FileMode.Create,FileAccess.ReadWrite))
+                //DrawingVisualにペンを描画
+                DrawingVisual dv = new DrawingVisual();
+                DrawingContext dc = dv.RenderOpen();
+
+                dc.DrawImage(MainImageBitmap, new Rect(0,0, image.Width, image.Height));
+                OutlineCanvas.Strokes.Draw(dc);
+                MainCanvas.Strokes.Draw(dc);
+
+                dc.Close();
+
+                //Bitmapに変換
+                RenderTargetBitmap rtb = new RenderTargetBitmap(image.Width, image.Height, 96, 96, PixelFormats.Pbgra32);
+                
+                rtb.Render(dv);
+
+                //一旦pngで強制保存する仕様
+                //もとのファイル形式に合わせて保存する
+                if (System.IO.Path.GetExtension(Filepath) == "png")
                 {
-                    //Apply print size setting.
-                    System.Drawing.Size printsize = new System.Drawing.Size((int)MainImageBitmap.Width, (int)MainImageBitmap.Height);
-                    System.Drawing.Size DPISize = new System.Drawing.Size((int)MainImageBitmap.DpiX, (int)MainImageBitmap.DpiY);
+                    var encoder = new PngBitmapEncoder();
 
-                    Bitmap main = Canvas2Bitmap(MainCanvas, printsize, DPISize);
-                    Bitmap outline = Canvas2Bitmap(OutlineCanvas, printsize, DPISize);
+                    encoder.Frames.Add(BitmapFrame.Create(rtb));
 
-                    Graphics g = Graphics.FromImage(image);
-                    g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
-
-                    System.Drawing.Color color = System.Drawing.Color.FromArgb(0,0,0,0);
-
-                    //rendering
-                    outline.MakeTransparent(color);
-                    main.MakeTransparent(color);
-                    g.DrawImage(outline, 0,0);
-                    g.DrawImage(main,0,0);
-                    g.Save();
-
-                    //A choose format from extention
-                    ImageFormat format = null;
-
-                    switch (System.IO.Path.GetExtension(Filepath))
+                    using (Stream stm = File.Create(Filepath))
                     {
-                        case ".jpg":
-                            format = ImageFormat.Jpeg;
-                            break;
-                        case ".jpeg":
-                            format = ImageFormat.Jpeg;
-                            break;
-                        case ".png":
-                            format = ImageFormat.Png;
-                            break;
+                        encoder.Save(stm);
+                        stm.Close();
                     }
+                }
+                else
+                {
+                    var encoder = new JpegBitmapEncoder();
 
-                    Bitmap dst = new Bitmap(image);
-                    dst.Save(str, format);
+                    encoder.Frames.Add(BitmapFrame.Create(rtb));
 
-                    isPainting = false;
-                    LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
-
-                    str.Close();
+                    using (Stream stm = File.Create(Filepath))
+                    {
+                        encoder.Save(stm);
+                        stm.Close();
+                    }
                 }
 
+
+                //終了処理
+                MainCanvas.Strokes.Clear();
+                OutlineCanvas.Strokes.Clear();
+
+                isPainting = false;
+                LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
+
+                //書き込みした画像を再読み込み
                 BitmapImage btm = new BitmapImage();
 
                 using (FileStream str = File.OpenRead(Filepath))
@@ -289,31 +298,6 @@ namespace FastPuri
             {
                 ShowInfomation("セーブに失敗しました");
             }
-        }
-
-        public Bitmap Canvas2Bitmap(InkCanvas canvas, System.Drawing.Size imagesize, System.Drawing.Size imageDPIs)
-        {
-            Bitmap result;
-            MemoryStream str = new MemoryStream();
-
-            using (var stream = new MemoryStream())
-            {
-                var renderbtm = new RenderTargetBitmap
-                    ((int)imagesize.Width, (int)imagesize.Height, imageDPIs.Width, imageDPIs.Height, PixelFormats.Pbgra32);
-
-
-                BitmapEncoder encoder = new BmpBitmapEncoder();
-                renderbtm.Render(canvas);
-
-                encoder.Frames.Add(BitmapFrame.Create(renderbtm));
-                encoder.Save(stream);
-
-                result = new Bitmap(stream);
-            }
-
-            canvas.Strokes.Clear();
-
-            return result;
         }
 
         private async void MainCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -394,8 +378,6 @@ namespace FastPuri
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            Save_Image(Filepaths[FileOrder]);
-
             Open_Savedialog(null, FileOrder, FileOrder, false, true);
         }
 
@@ -428,7 +410,7 @@ namespace FastPuri
             DoubleAnimation animation = new DoubleAnimation();
             animation.From = 1;
             animation.To = 0;
-            animation.Duration = new Duration(TimeSpan.FromSeconds(3));
+            animation.Duration = new Duration(TimeSpan.FromSeconds(4));
 
             Popup_Infomation.BeginAnimation(System.Windows.Controls.Button.OpacityProperty, animation);
         }
