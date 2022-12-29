@@ -1,15 +1,17 @@
 # FastPuri
 
 画像にサクサク描き込みをするためのアプリ  
-プリクラの挙動をモチーフに赤ペン先生的な用途を想定  
-![Trello](https://trello.com/invite/b/tIQP8ldx/973cca43e1c8cddd265606effbf86168/fastpuri開発板)
+プリクラの挙動をモチーフに赤ペン先生的な用途を想定してます  
 
 
 ## 使い方
 
-①Releasesから最新の"FastPuri.zip"をダウンロード  
-②zipを解凍して中のFastPuri.exeを任意の場所に移動させる  
-③FastPuri.exeをダブルクリックで起動（インストールは不要）  
+~~①Releasesから最新の"FastPuri.zip"をダウンロード~~  
+~~②zipを解凍して中のFastPuri.exeを任意の場所に移動させる~~  
+~~③FastPuri.exeをダブルクリックで起動（インストールは不要）~~  
+  
+察してください。  
+いずれWindowsStoreにリリースします。それまではSmartScreenと戦ってね…  
   
   ---------------------
   
