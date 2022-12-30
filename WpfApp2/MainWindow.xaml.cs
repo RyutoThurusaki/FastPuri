@@ -145,69 +145,74 @@ namespace FastPuri
             //Image opening to canvas.
             if (isload)
             {
-                //Null check.
-                if (System.IO.File.Exists(Filepaths[FileOrder]))
+                Load_Image();
+            }
+        }
+
+        private void Load_Image()
+        {
+            //Null check.
+            if (System.IO.File.Exists(Filepaths[FileOrder]))
+            {
+                OutlineCanvas.Strokes.Clear();
+                MainCanvas.Strokes.Clear();
+
+                BitmapImage btm = new BitmapImage();
+                LabelInfomation.Content = Filepaths[FileOrder];
+
+                using (FileStream str = File.OpenRead(Filepaths[FileOrder]))
                 {
-                    OutlineCanvas.Strokes.Clear();
-                    MainCanvas.Strokes.Clear();
-
-                    BitmapImage btm = new BitmapImage();
-                    LabelInfomation.Content = Filepaths[FileOrder];
-
-                    using (FileStream str = File.OpenRead(Filepaths[FileOrder]))
-                    {
-                        btm.BeginInit();
-                        btm.StreamSource = str;
-                        btm.CacheOption = BitmapCacheOption.OnLoad;
-                        btm.CreateOptions = BitmapCreateOptions.None;
-                        btm.EndInit();
-                        btm.Freeze();
-                    }
-
-                    MainImage.Source = btm;
-                    MainImageBitmap = btm;
-
-                    MainCanvas.Height = MainImageBitmap.Height;
-                    MainCanvas.Width = MainImageBitmap.Width;
-
-                    canvas.Height = MainImageBitmap.Height;
-                    canvas.Width = MainImageBitmap.Width;
-
-
-                    //Canvas change scale.
-                    Rect ViewRect = new Rect();
-                    ViewRect.Width = ScrollViewer.ActualWidth;
-                    ViewRect.Height = ScrollViewer.ActualHeight;
-
-                    Rect ImageRect = new Rect();
-                    ImageRect.Width = MainImageBitmap.Width;
-                    ImageRect.Height = MainImageBitmap.Height;
-
-                    Rect ResultRect = new Rect();
-                    ResultRect.Width = ViewRect.Width / ImageRect.Width;
-                    ResultRect.Height = ViewRect.Height / ImageRect.Height;
-
-                    float Scale = 0;
-
-                    switch (ResultRect.Width.CompareTo(ResultRect.Height))
-                    {
-                        case 0:
-                            Scale = (float)ResultRect.Height;
-                            break;
-                        case 1:
-                            Scale = (float)ResultRect.Height;
-                            break;
-                        case -1:
-                            Scale = (float)ResultRect.Width;
-                            break ;
-                    }
-
-                    slider.Value = Scale;
+                    btm.BeginInit();
+                    btm.StreamSource = str;
+                    btm.CacheOption = BitmapCacheOption.OnLoad;
+                    btm.CreateOptions = BitmapCreateOptions.None;
+                    btm.EndInit();
+                    btm.Freeze();
                 }
-                else
+
+                MainImage.Source = btm;
+                MainImageBitmap = btm;
+
+                MainCanvas.Height = MainImageBitmap.Height;
+                MainCanvas.Width = MainImageBitmap.Width;
+
+                canvas.Height = MainImageBitmap.Height;
+                canvas.Width = MainImageBitmap.Width;
+
+
+                //Canvas change scale.
+                Rect ViewRect = new Rect();
+                ViewRect.Width = ScrollViewer.ActualWidth;
+                ViewRect.Height = ScrollViewer.ActualHeight;
+
+                Rect ImageRect = new Rect();
+                ImageRect.Width = MainImageBitmap.Width;
+                ImageRect.Height = MainImageBitmap.Height;
+
+                Rect ResultRect = new Rect();
+                ResultRect.Width = ViewRect.Width / ImageRect.Width;
+                ResultRect.Height = ViewRect.Height / ImageRect.Height;
+
+                float Scale = 0;
+
+                switch (ResultRect.Width.CompareTo(ResultRect.Height))
                 {
-                    MainImage.Source = null;
+                    case 0:
+                        Scale = (float)ResultRect.Height;
+                        break;
+                    case 1:
+                        Scale = (float)ResultRect.Height;
+                        break;
+                    case -1:
+                        Scale = (float)ResultRect.Width;
+                        break;
                 }
+
+                slider.Value = Scale;
+            }
+            else
+            {
+                MainImage.Source = null;
             }
         }
 
@@ -279,20 +284,9 @@ namespace FastPuri
                 LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
 
                 //書き込みした画像を再読み込み
-                BitmapImage btm = new BitmapImage();
-
-                using (FileStream str = File.OpenRead(Filepath))
-                {
-                    btm.BeginInit();
-                    btm.StreamSource = str;
-                    btm.CacheOption = BitmapCacheOption.OnLoad;
-                    btm.CreateOptions = BitmapCreateOptions.None;
-                    btm.EndInit();
-                    btm.Freeze();
-                }
+                Load_Image();
 
                 ShowInfomation("セーブしました");
-                MainImage.Source = btm;
             }
             else
             {
