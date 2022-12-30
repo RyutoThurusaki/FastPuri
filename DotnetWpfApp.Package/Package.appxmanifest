@@ -7,13 +7,13 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="691a6999-8d46-41d9-b770-87319678711f"
-    Publisher="CN=uozum"
+    Name="14722uozumiryuto.FastPuri"
+    Publisher="CN=B1C97231-A9CB-4BE0-9288-93F1E424EF01"
     Version="1.0.0.0" />
 
   <Properties>
-    <DisplayName>DotnetWpfApp.Package</DisplayName>
-    <PublisherDisplayName>uozum</PublisherDisplayName>
+    <DisplayName>FastPuri</DisplayName>
+    <PublisherDisplayName>RyutoThurusaki</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
 
@@ -31,7 +31,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="DotnetWpfApp.Package"
+        DisplayName="FastPuri"
         Description="DotnetWpfApp.Package"
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
