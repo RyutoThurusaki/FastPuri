@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FastPuri"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="FastPuri" Height="450" Width="1024"
+        Title="FastPuri" Height="512" Width="1024"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
