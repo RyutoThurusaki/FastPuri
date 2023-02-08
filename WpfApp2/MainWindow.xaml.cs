@@ -77,9 +77,6 @@ namespace FastPuri
 
         private void Open_Savedialog(FileDialog filedialog, int new_fileorder, int old_fileorder, bool isloadarray, bool isloadimage)
         {
-            //Array load cancel.
-            bool isload = isloadimage;
-
             //Ask if want to save image.
             if (isPainting)
             {
@@ -87,28 +84,21 @@ namespace FastPuri
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    isload = true;
-
                     Save_Image(Filepaths[old_fileorder]);
                 }
                 else if (result == MessageBoxResult.No)
                 {
-                    isload = true;
-                    isPainting = false;
-                    LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
-
-                    OutlineCanvas.Strokes.Clear();
-                    MainCanvas.Strokes.Clear();
+                    ClearDrawing();
                 }
                 else if (result == MessageBoxResult.Cancel)
                 {
-                    isload = false;
+                    return;
                     //do not
                 }
             }
 
             //Reload file pathes in array.
-            if (isloadarray == true && isload == true)
+            if (isloadarray)
             {
                 // Save directory path.
                 FileInfo fi = new FileInfo(filedialog.FileName);
@@ -117,6 +107,7 @@ namespace FastPuri
                 //Get all files path.Find the index for the opening file.
                 if (isAllextention)
                 {
+                    //拡張子の取り込む順序は決め打ちしておきたい
                     string[] src_jpg = System.IO.Directory.GetFiles(Defaultfilepath, "*.jpg", System.IO.SearchOption.TopDirectoryOnly);
                     string[] src_jpeg = System.IO.Directory.GetFiles(Defaultfilepath, "*.jpeg", System.IO.SearchOption.TopDirectoryOnly);
                     string[] src_png = System.IO.Directory.GetFiles(Defaultfilepath, "*.png", System.IO.SearchOption.TopDirectoryOnly);
@@ -137,16 +128,13 @@ namespace FastPuri
 
                 FileOrder = Array.IndexOf(Filepaths, filedialog.FileName);
             }
-            else if (isloadarray == false && isload == true)
+            else
             {
                 FileOrder = new_fileorder;
             }
 
             //Image opening to canvas.
-            if (isload)
-            {
-                Load_Image();
-            }
+            Load_Image();
         }
 
         private void Load_Image()
@@ -154,8 +142,7 @@ namespace FastPuri
             //Null check.
             if (System.IO.File.Exists(Filepaths[FileOrder]))
             {
-                OutlineCanvas.Strokes.Clear();
-                MainCanvas.Strokes.Clear();
+                ClearDrawing();
 
                 BitmapImage btm = new BitmapImage();
                 LabelInfomation.Content = Filepaths[FileOrder];
@@ -275,16 +262,7 @@ namespace FastPuri
                     }
                 }
 
-
-                //終了処理
-                MainCanvas.Strokes.Clear();
-                OutlineCanvas.Strokes.Clear();
-
-                isPainting = false;
-                LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
-
-                //書き込みした画像を再読み込み
-                Load_Image();
+                ClearDrawing();
 
                 ShowInfomation("セーブしました");
             }
@@ -372,7 +350,8 @@ namespace FastPuri
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            Open_Savedialog(null, FileOrder, FileOrder, false, true);
+            Save_Image(Filepaths[FileOrder]);
+            Load_Image();
         }
 
         private void ColorSelect_Click(object sender, RoutedEventArgs e)
@@ -407,6 +386,15 @@ namespace FastPuri
             animation.Duration = new Duration(TimeSpan.FromSeconds(4));
 
             Popup_Infomation.BeginAnimation(System.Windows.Controls.Button.OpacityProperty, animation);
+        }
+
+        private void ClearDrawing()
+        {
+            MainCanvas.Strokes.Clear();
+            OutlineCanvas.Strokes.Clear();
+
+            isPainting = false;
+            LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
         }
     }
 }
