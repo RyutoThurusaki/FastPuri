@@ -42,7 +42,7 @@ namespace FastPuri
     {
         //布団が吹っ飛んだ
         string Defaultfilepath = null;
-        string[] Filepaths = { null };
+        List<string> Filepaths = new List<string>();
 
         int FileOrder = 0;
 
@@ -127,15 +127,16 @@ namespace FastPuri
                     src_jpeg.CopyTo(dst, src_jpg.Length);
                     src_png.CopyTo(dst,src_jpg.Length+src_jpeg.Length);
 
-                    Filepaths = dst;
+                    Filepaths = new List<string>(dst);
                 }
                 else
                 {
                     string extension = "*" + System.IO.Path.GetExtension(filedialog.FileName);
-                    Filepaths = System.IO.Directory.GetFiles(Defaultfilepath, extension, System.IO.SearchOption.TopDirectoryOnly);
+                    string[] dst = System.IO.Directory.GetFiles(Defaultfilepath, extension, System.IO.SearchOption.TopDirectoryOnly);
+                    Filepaths = new List<string>(dst) ;
                 }
 
-                FileOrder = Array.IndexOf(Filepaths, filedialog.FileName);
+                FileOrder = Filepaths.IndexOf(filedialog.FileName);
             }
             else if (isloadarray == false && isload == true)
             {
@@ -331,13 +332,13 @@ namespace FastPuri
             }
             else
             {
-                Open_Savedialog(null, Filepaths.Length - 1, FileOrder, false, true);
+                Open_Savedialog(null, Filepaths.Count - 1, FileOrder, false, true);
             }
         }
 
         private void Button_Next_Click(object sender, RoutedEventArgs e)
         {
-            if (FileOrder < Filepaths.Length - 1)
+            if (FileOrder < Filepaths.Count - 1)
             {
                 Open_Savedialog(null, FileOrder + 1, FileOrder, false, true);
             }
