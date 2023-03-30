@@ -20,8 +20,6 @@ using System.Windows.Shapes;
 using System.Windows.Ink;
 using System.Drawing;
 using System.Drawing.Imaging;
-using Image = System.Windows.Controls.Image;
-using Color = System.Windows.Media.Color;
 using static System.Net.Mime.MediaTypeNames;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
@@ -32,15 +30,18 @@ using System.Windows.Media.Animation;
 using System.Security.AccessControl;
 using System.Web.UI.WebControls;
 using System.Security.Policy;
-using Rectangle = System.Drawing.Rectangle;
 using System.Globalization;
 using Microsoft.SqlServer.Server;
+
+using Rectangle = System.Drawing.Rectangle;
+using Image = System.Windows.Controls.Image;
+using Color = System.Windows.Media.Color;
+using System.Runtime.CompilerServices;
 
 namespace FastPuri
 {
     public partial class MainWindow : System.Windows.Window
     {
-        //布団が吹っ飛んだ
         string Defaultfilepath = null;
         List<string> Filepaths = new List<string>();
 
@@ -54,6 +55,8 @@ namespace FastPuri
         public Color color_outline = Colors.White;
         public int pensize;
         public int outlinesize;
+
+        //UserSettings
 
         BitmapImage MainImageBitmap = new BitmapImage();
 
@@ -94,11 +97,7 @@ namespace FastPuri
                 else if (result == MessageBoxResult.No)
                 {
                     isload = true;
-                    isPainting = false;
-                    LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
-
-                    OutlineCanvas.Strokes.Clear();
-                    MainCanvas.Strokes.Clear();
+                    Initialize();
                 }
                 else if (result == MessageBoxResult.Cancel)
                 {
@@ -152,12 +151,11 @@ namespace FastPuri
 
         private void Load_Image()
         {
-            //Null check.
-            if (System.IO.File.Exists(Filepaths[FileOrder]))
-            {
-                OutlineCanvas.Strokes.Clear();
-                MainCanvas.Strokes.Clear();
+            Initialize();
 
+            //Null check.
+            if (NullValidation())
+            {
                 BitmapImage btm = new BitmapImage();
                 LabelInfomation.Content = Filepaths[FileOrder];
 
@@ -210,10 +208,6 @@ namespace FastPuri
                 }
 
                 slider.Value = Scale;
-            }
-            else
-            {
-                MainImage.Source = null;
             }
         }
 
@@ -276,13 +270,7 @@ namespace FastPuri
                     }
                 }
 
-
-                //終了処理
-                MainCanvas.Strokes.Clear();
-                OutlineCanvas.Strokes.Clear();
-
-                isPainting = false;
-                LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
+                Initialize();
 
                 //書き込みした画像を再読み込み
                 Load_Image();
@@ -348,6 +336,46 @@ namespace FastPuri
             }
         }
 
+        private void Button_Delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (NullValidation())
+            {
+
+                //書き込みがある場合のダイアログ確認
+                if (isPainting)
+                {
+                    MessageBoxResult result = MessageBox.Show("保存せず削除しますか？", "SaveDialog", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
+                    if (result != MessageBoxResult.Yes)
+                    {
+                        return;
+                    }
+                }
+
+                Initialize();
+
+                ShowInfomation("画像を削除中です……");
+
+                //ゴミ箱送り
+                FileSystem.DeleteFile(Filepaths[FileOrder], UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                //画像PathをArreyから削除
+                Filepaths.RemoveAt(FileOrder);
+
+                ShowInfomation("画像をゴミ箱に送りました");
+
+                //次の画像を表示
+                if (FileOrder < Filepaths.Count)
+                {
+                    Open_Savedialog(null, FileOrder, FileOrder, false, true);
+                }
+                else
+                {
+                    Open_Savedialog(null, 0, FileOrder, false, true);
+                }
+            }
+
+            }
+
         private void Mode_Eraser_Click(object sender, RoutedEventArgs e)
         {
             isPointErace = !isPointErace;
@@ -408,6 +436,29 @@ namespace FastPuri
             animation.Duration = new Duration(TimeSpan.FromSeconds(4));
 
             Popup_Infomation.BeginAnimation(System.Windows.Controls.Button.OpacityProperty, animation);
+        }
+
+        private bool NullValidation()
+        {
+            if (Filepaths.Count != 0 && System.IO.File.Exists(Filepaths[FileOrder]))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private void Initialize()
+        {
+            //初期化処理
+            MainCanvas.Strokes.Clear();
+            OutlineCanvas.Strokes.Clear();
+
+            isPainting = false;
+            LabelInfomation.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 173, 171, 189));
+
+            MainImage.Source = null;
+
+            LabelInfomation.Content = "FastPuri";
         }
     }
 }

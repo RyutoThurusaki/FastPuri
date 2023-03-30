@@ -39,9 +39,9 @@
         <Slider x:Name="slider" HorizontalAlignment="Right" Margin="0,10,136,0" VerticalAlignment="Top" Width="149" Maximum="2" Minimum="0.1" Value="1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="24"/>
         <Label Content="Image not found." HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" ScrollViewer.VerticalScrollBarVisibility="Disabled" Foreground="{DynamicResource MaterialDesignDarkBackground}" Margin="387,136,387,177" Grid.Row="1"/>
 
-        <Button x:Name="ColorSelect" Content="Outline" HorizontalAlignment="Left" Margin="203,5,0,0" VerticalAlignment="Top" Click="ColorSelect_Click" Height="27" Width="26" Foreground="{x:Null}" FontWeight="Normal" Cursor="Hand" Background="{x:Null}" Panel.ZIndex="4"/>
-        <Button x:Name="Mode_Eraser" Click="Mode_Eraser_Click" HorizontalAlignment="Left" Margin="139,5,0,0" VerticalAlignment="Top" Width="27" Height="27" Cursor="Hand" Background="#FF03A9F4"/>
-        <Button x:Name="Mode_Pen" Click="Mode_Pen_Click" Content="" HorizontalAlignment="Left" Margin="171,5,0,0" VerticalAlignment="Top" Width="27" Height="27" Cursor="Hand"/>
+        <Button x:Name="ColorSelect" Content="Outline" HorizontalAlignment="Left" Margin="266,5,0,0" VerticalAlignment="Top" Click="ColorSelect_Click" Height="27" Width="26" Foreground="{x:Null}" FontWeight="Normal" Cursor="Hand" Background="{x:Null}" Panel.ZIndex="4"/>
+        <Button x:Name="Mode_Eraser" Click="Mode_Eraser_Click" HorizontalAlignment="Left" Margin="202,5,0,0" VerticalAlignment="Top" Width="27" Height="27" Cursor="Hand" Background="#FF03A9F4"/>
+        <Button x:Name="Mode_Pen" Click="Mode_Pen_Click" Content="" HorizontalAlignment="Left" Margin="234,5,0,0" VerticalAlignment="Top" Width="27" Height="27" Cursor="Hand"/>
 
         <ScrollViewer x:Name="ScrollViewer"
                       Grid.Row="0" Margin="0,37,0,0"
@@ -70,20 +70,21 @@
 
             </Canvas>
         </ScrollViewer>
-        <Image x:Name="Eraser" Margin="139,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="2" Height="27" Width="27" IsHitTestVisible="False" Source="/FastPuri_Eraser.png">
+        <Image x:Name="Eraser" Margin="202,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="2" Height="27" Width="27" IsHitTestVisible="False" Source="/FastPuri_Eraser.png">
             <Image.OpacityMask>
                 <ImageBrush ImageSource="/FastPuri_Eraser.png"/>
             </Image.OpacityMask>
         </Image>
-        <Image x:Name="Pen" Margin="171,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="2" Height="27" Width="27" IsHitTestVisible="False" Source="/FastPuri_Pen.png">
+        <Image x:Name="Pen" Margin="234,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="2" Height="27" Width="27" IsHitTestVisible="False" Source="/FastPuri_Pen.png">
             <Image.OpacityMask>
                 <ImageBrush ImageSource="/FastPuri_Pen.png"/>
             </Image.OpacityMask>
         </Image>
-        <Image x:Name="Preview_Back" Margin="203,5,0,0" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="1" Width="26" Height="27" Source="/Ichimatu.png"/>
-        <Ellipse x:Name="Preview_Pen" Stroke="White" Fill="Black" StrokeThickness="4.5" Margin="205,7,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="22" Width="22" Panel.ZIndex="2"/>
+        <Image x:Name="Preview_Back" Margin="266,5,0,0" IsHitTestVisible="False" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="1" Width="26" Height="27" Source="/Ichimatu.png"/>
+        <Ellipse x:Name="Preview_Pen" Stroke="White" Fill="Black" StrokeThickness="4.5" Margin="268,7,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="22" Width="22" Panel.ZIndex="2"/>
         <Border x:Name="Popup_Infomation" BorderThickness="1" CornerRadius="25,25,25,25" Margin="245,20,245,0" Grid.Row="1" Height="50" Background="#7F000000" Panel.ZIndex="5" VerticalAlignment="Top" Width="500" Opacity="0" HorizontalAlignment="Center" IsHitTestVisible="False">
             <Label x:Name="Popup_Text" HorizontalContentAlignment="Center" FontSize="24" Foreground="White" VerticalContentAlignment="Center" Background="{x:Null}" Content="Hogehoge" Height="45" Width="500" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"/>
         </Border>
+        <Button x:Name="Button_Delete" Content="Delete" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button_Delete_Click" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Width="54" Margin="133,5,0,0" Padding="3,1,3,1" Height="27" FontWeight="Normal" Foreground="White"/>
     </Grid>
 </Window>
