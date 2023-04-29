@@ -6,12 +6,8 @@
 
 ## 使い方
 
-~~①Releasesから最新の"FastPuri.zip"をダウンロード~~  
-~~②zipを解凍して中のFastPuri.exeを任意の場所に移動させる~~  
-~~③FastPuri.exeをダブルクリックで起動（インストールは不要）~~  
-  
-察してください。  
-いずれWindowsStoreにリリースします。それまではSmartScreenと戦ってね…  
+・マイクロソフトストアからダウンロードする
+https://www.microsoft.com/store/productId/9NGD8C546JTD
   
   ---------------------
   
